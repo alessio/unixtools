@@ -7,6 +7,7 @@ Run `refiles -help` and you will be presented with the following
 help screen:
 
 ```
+  -I	prompt before every overwrite
   -R	search files under each directory recursively
   -m	move files matching PATTERN to REPLACE
   -simulate
