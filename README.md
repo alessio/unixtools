@@ -5,4 +5,9 @@
 
 # tools
 
-Convenience Tools
+alessio's Convenience Tools.
+
+# What's in This Repo?
+
+* **elvoke**: Run or postpone a command, depending on how much time elapsed from the last successful run.
+* **refiles**: Rename files in directories that match a given pattern.
