@@ -24,8 +24,7 @@ func init() {
 	flag.CommandLine.SetOutput(os.Stderr)
 	flag.CommandLine.Usage = func() {
 		_, _ = fmt.Fprintln(flag.CommandLine.Output(), `Usage: refiles [OPTIONS] PATTERN REPLACE [DIRECTORY]...
-Rename files in directories that match a given pattern.
-`)
+Rename files in directories that match a given pattern.`)
 		flag.PrintDefaults()
 		_, _ = fmt.Fprintln(flag.CommandLine.Output(), `
 It could be used to replace the matched patten with the replace pattern.
@@ -41,8 +40,7 @@ Move files like 6.1.001 to vim-6.1-001.patch:
   refiles -m '^6.1.(\d{3})$' 'vim-6.1-$1.patch'
 
 Written by Alessio Treglia <alessio@debian.org>.
-Inspired by Gustavo Niemeyer's remv: http://niemeyer.net/remv.
-`)
+Inspired by Gustavo Niemeyer's remv: http://niemeyer.net/remv.`)
 	}
 	flag.BoolVar(&moveMode, "m", false, "move files matching PATTERN to REPLACE")
 	flag.BoolVar(&recursiveMode, "R", false, "search files under each directory recursively")
