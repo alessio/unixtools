@@ -66,6 +66,7 @@ func main() {
 
 	for _, dir := range dirs {
 		wg.Add(1)
+
 		go func(d string, pattern *regexp.Regexp, replace string) {
 			defer wg.Done()
 			walkDirectory(d, pattern, replace)
@@ -158,10 +159,10 @@ func confirmPrompt(from, to string) bool {
 }
 
 func usage() {
-	_, _ = fmt.Fprintln(flag.CommandLine.Output(), `Usage: refiles [OPTIONS] PATTERN REPLACE [DIRECTORY]...
+	fmt.Fprintln(flag.CommandLine.Output(), `Usage: refiles [OPTIONS] PATTERN REPLACE [DIRECTORY]...
 Rename files that match a given pattern.`)
 	flag.PrintDefaults()
-	_, _ = fmt.Fprintln(flag.CommandLine.Output(), `
+	fmt.Fprintln(flag.CommandLine.Output(), `
 This program replaces the matched patten in filenames with the
 replace pattern. The '-m' option replaces the complete filename
 with the replace pattern.

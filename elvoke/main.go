@@ -77,6 +77,7 @@ func main() {
 	switch {
 	case err != nil && os.IsNotExist(err):
 		printDebug("stampfile does not exist, will run")
+
 		needRun = true
 	case err != nil:
 		log.Fatal(err)
@@ -91,6 +92,7 @@ func main() {
 			printDebug("no need to run, exiting with success")
 			os.Exit(0)
 		}
+
 		printDebug("no need to run, failing")
 		os.Exit(1)
 	}
@@ -157,5 +159,6 @@ Run or postpone a command, depending on how much time elapsed from the last succ
 
 Options:`
 	_, _ = fmt.Fprintln(os.Stderr, usageString)
+
 	flag.PrintDefaults()
 }

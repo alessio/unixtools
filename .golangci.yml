@@ -29,8 +29,10 @@ linters:
     - stylecheck
     - typecheck
     - unconvert
+    - unparam
     - unused
     - misspell
+    - wsl
 
 issues:
   exclude-rules:
