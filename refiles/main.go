@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -8,41 +9,26 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 )
 
 var (
-	recursiveMode bool
-	moveMode      bool
-	simulateMode  bool
-	verboseMode   bool
+	recursiveMode   bool
+	interactiveMode bool
+	moveMode        bool
+	simulateMode    bool
+	verboseMode     bool
 
 	verboseLog *log.Logger
 )
 
 func init() {
 	flag.CommandLine.SetOutput(os.Stderr)
-	flag.CommandLine.Usage = func() {
-		_, _ = fmt.Fprintln(flag.CommandLine.Output(), `Usage: refiles [OPTIONS] PATTERN REPLACE [DIRECTORY]...
-Rename files in directories that match a given pattern.`)
-		flag.PrintDefaults()
-		_, _ = fmt.Fprintln(flag.CommandLine.Output(), `
-It could be used to replace the matched patten with the replace pattern.
-The '-m' option replaces the complete filename with the replace pattern. 
-With no DIRECTORY, it runs over the current working directory.
+	flag.CommandLine.Usage = usage
 
-Examples:
-
-Replace spaces in filenames with underlines:
-  refiles ' ' '_'
-
-Move files like 6.1.001 to vim-6.1-001.patch:
-  refiles -m '^6.1.(\d{3})$' 'vim-6.1-$1.patch'
-
-Written by Alessio Treglia <alessio@debian.org>.
-Inspired by Gustavo Niemeyer's remv: http://niemeyer.net/remv.`)
-	}
 	flag.BoolVar(&moveMode, "m", false, "move files matching PATTERN to REPLACE")
+	flag.BoolVar(&interactiveMode, "I", false, "prompt before every overwrite")
 	flag.BoolVar(&recursiveMode, "R", false, "search files under each directory recursively")
 	flag.BoolVar(&simulateMode, "simulate", false, "print changes that are supposed to be done, but don't actually make any")
 	flag.BoolVar(&verboseMode, "verbose", false, "enable verbose output")
@@ -108,7 +94,7 @@ func walkDirectory(dir string, pattern *regexp.Regexp, replace string) {
 		}
 
 		rename(path, filepath.Join(filepath.Dir(path),
-			replaceFilename(pattern, info.Name(), replace)), simulateMode)
+			replaceFilename(pattern, info.Name(), replace)), interactiveMode, simulateMode)
 
 		return nil
 	}); err != nil {
@@ -133,12 +119,18 @@ func replaceFilename(pattern *regexp.Regexp, filename, replace string) string {
 	return string(result)
 }
 
-func rename(orig, new string, simulate bool) {
+func rename(orig, new string, interactive, simulate bool) {
 	if orig == new { // skip if noop
 		return
 	}
 
 	verboseLog.Printf("%q -> %q", orig, new)
+
+	if interactive {
+		if _, err := os.Stat(new); err == nil && !confirmPrompt(orig, new) {
+			return
+		}
+	}
 
 	if simulate {
 		return
@@ -147,4 +139,43 @@ func rename(orig, new string, simulate bool) {
 	if err := os.Rename(orig, new); err != nil {
 		log.Printf("couldn't rename %s: %v", orig, err)
 	}
+}
+
+func confirmPrompt(from, to string) bool {
+	reader := bufio.NewReader(os.Stdin)
+	_, _ = fmt.Fprintf(flag.CommandLine.Output(), "rename %q to %q?", from, to)
+
+	response, err := reader.ReadString('\n')
+	if err != nil {
+		return false
+	}
+
+	if response := strings.ToLower(strings.TrimSpace(response)); response == "y" || response == "yes" {
+		return true
+	}
+
+	return false
+}
+
+func usage() {
+	_, _ = fmt.Fprintln(flag.CommandLine.Output(), `Usage: refiles [OPTIONS] PATTERN REPLACE [DIRECTORY]...
+Rename files that match a given pattern.`)
+	flag.PrintDefaults()
+	_, _ = fmt.Fprintln(flag.CommandLine.Output(), `
+This program replaces the matched patten in filenames with the
+replace pattern. The '-m' option replaces the complete filename
+with the replace pattern.
+
+With no DIRECTORY, it runs over the current working directory.
+
+Examples:
+
+Replace spaces in filenames with underlines:
+  refiles ' ' '_'
+
+Move files like 6.1.001 to vim-6.1-001.patch:
+  refiles -m '^6.1.(\d{3})$' 'vim-6.1-$1.patch'
+
+Written by Alessio Treglia <alessio@debian.org>.
+Inspired by Gustavo Niemeyer's remv: http://niemeyer.net/remv.`)
 }
