@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/alessio/tools/internal/dirbaks"
+	"github.com/alessio/tools/internal/dirsnapshots"
 )
 
 func main() {
@@ -24,18 +24,22 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	config := dirbaks.Load()
-	err = restoreDirectory(target, config)
-
-	dirbaks.Save(config)
-
+	backups, err := dirsnapshots.Load()
 	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if err := restoreDirectory(target, backups); err != nil {
+		log.Fatalln(err)
+	}
+
+	if err := dirsnapshots.Save(backups); err != nil {
 		log.Fatalln(err)
 	}
 }
 
-func restoreDirectory(target string, config *dirbaks.Config) error {
-	orig, ok := config.PopDir(target)
+func restoreDirectory(target string, backups *dirsnapshots.Backups) error {
+	orig, ok := backups.PopDir(target)
 	if !ok {
 		return fmt.Errorf("no backups available")
 	}

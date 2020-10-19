@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/alessio/tools/internal/dirbaks"
+	"github.com/alessio/tools/internal/dirsnapshots"
 	"github.com/alessio/tools/internal/file"
 )
 
@@ -31,24 +31,27 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	config := dirbaks.Load()
-
-	err = backupDirectory(target, config)
-
-	dirbaks.Save(config)
-
+	backups, err := dirsnapshots.Load()
 	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if err := backupDirectory(target, backups); err != nil {
+		log.Fatalln(err)
+	}
+
+	if err := dirsnapshots.Save(backups); err != nil {
 		log.Fatalln(err)
 	}
 }
 
-func backupDirectory(target string, config *dirbaks.Config) error {
-	backupDir, err := ioutil.TempDir(config.SnapshotsDir(), "")
+func backupDirectory(target string, backups *dirsnapshots.Backups) error {
+	backupDir, err := ioutil.TempDir(backups.SnapshotsDir(), "")
 	if err != nil {
 		return err
 	}
 
-	defer config.PushDir(target, backupDir)
+	defer backups.PushDir(target, backupDir)
 
 	if shelveMode {
 		return os.Rename(target, backupDir)
