@@ -14,7 +14,7 @@ import (
 var shelveMode bool
 
 func init() {
-	flag.BoolVar(&shelveMode, "-shelve", false, "shelve the directory once the backup copy is done")
+	flag.BoolVar(&shelveMode, "shelve", false, "shelve the directory once the backup copy is done")
 }
 
 func main() {
