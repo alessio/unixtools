@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/alessio/tools/internal/file"
+	"github.com/alessio/unixtools/internal/file"
 )
 
 func TestCopyDir(t *testing.T) {
