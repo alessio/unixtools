@@ -13,14 +13,73 @@ alessio's UNIX Convenience Tools.
 
 Run or postpone a command, depending on how much time elapsed from the last successful run.
 
+### Installation
+
+Just run:
+
+```
+$ go get github.com/alessio/unixtools/elvoke
+```
+
+### Credits
+
+This is a Golang implementation of [Jakub Wilk's elvoke](https://github.com/jwilk/elvoke).
+
 ## refiles
 
 Rename files in directories that match a given pattern.
 
+### Installation
+
+Just
+
+```
+go get github.com/alessio/unixtools/refiles
+```
+
+### Options
+
+Run `refiles -help` to print the following help screen:
+
+```
+  -I	prompt before every overwrite
+  -R	search files under each directory recursively
+  -m	move files matching PATTERN to REPLACE
+  -simulate
+    	print changes that are supposed to be done, but don't actually make any
+  -verbose
+    	enable verbose output
+```
+
+### Credits
+
+Written by Alessio Treglia.
+Inspired by @niemeyer's [remv](http://niemeyer.net/remv).
+
 ## popbak, pushbak
 
-Manage a stack of directories backups.
+Manage a stack of directories backups. **pushbak** makes backups of a directory, **popbak**
+restores the last backup available.
+
+### Installation
+
+Just
+
+```
+go get github.com/alessio/unixtools/pushback
+go get github.com/alessio/unixtools/popback
+```
 
 ## seq
 
-Golang implementation of the UNIX `seq` command.
+Golang implementation of the UNIX `seq` command. It prints sequences of numbers.
+
+This is a Go implementation of the UNIX `seq` command.
+
+### Installation
+
+Just
+
+```
+go get github.com/alessio/unixtools/seq
+```
