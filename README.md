@@ -9,6 +9,18 @@ alessio's UNIX Convenience Tools.
 
 # What's in This Repo?
 
-* **elvoke**: Run or postpone a command, depending on how much time elapsed from the last successful run.
-* **refiles**: Rename files in directories that match a given pattern.
-* **popbak**, **pushbak**: Manage a stack of directories backups.
+## elvoke
+
+Run or postpone a command, depending on how much time elapsed from the last successful run.
+
+## refiles
+
+Rename files in directories that match a given pattern.
+
+## popbak, pushbak
+
+Manage a stack of directories backups.
+
+## seq
+
+Golang implementation of the UNIX `seq` command.
