@@ -45,6 +45,7 @@ func (s *intSequence) Items() <-chan string { return s.data }
 func (s *intSequence) WidthExceeded() bool {
 	s.widthExceededMutex.Lock()
 	defer s.widthExceededMutex.Unlock()
+
 	return s.widthExceeded
 }
 
@@ -62,6 +63,7 @@ func (s *intSequence) push(start int) {
 				defer s.widthExceededMutex.RUnlock()
 				s.widthExceeded = true
 			}()
+
 			break
 		}
 

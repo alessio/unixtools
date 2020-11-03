@@ -102,6 +102,7 @@ func parseIntArg(i int) int {
 	if err != nil {
 		log.Fatalf("%q is not a valid integer", flag.Arg(i))
 	}
+
 	return out
 }
 
@@ -112,6 +113,7 @@ func usage() {
 Print numbers from FIRST to LAST, in steps of INCREMENT.
 `
 	_, _ = fmt.Fprintln(os.Stderr, usageString)
+
 	flag.PrintDefaults()
 }
 
