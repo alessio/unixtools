@@ -3,7 +3,7 @@
 [![license](https://img.shields.io/github/license/alessio/unixtools.svg)](https://github.com/alessio/unixtools/blob/master/LICENSE)
 [![LoC](https://tokei.rs/b1/github/alessio/unixtools)](https://github.com/alessio/unixtools)
 
-# tools
+# unixtools
 
 alessio's UNIX Convenience Tools.
 
