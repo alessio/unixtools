@@ -14,7 +14,11 @@ func TestCopyDir(t *testing.T) {
 	}
 
 	if err := file.CopyDir("non-existing", filepath.Join(t.TempDir(), "testdata")); err == nil {
-		t.Fatal("expected error, got nil: non-existing dir can not be copied", err)
+		t.Fatal("expected error, got nil: non-existing dir can not be copied")
+	}
+
+	if err := file.CopyDir(filepath.Join("testdata", "regular"), filepath.Join(t.TempDir(), "testdata")); err == nil {
+		t.Fatal("expected error, got nil: src must be a directory")
 	}
 
 	if err := file.CopyDir("testdata", t.TempDir()); err == nil {
