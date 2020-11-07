@@ -42,7 +42,7 @@ func Load() (*Backups, error) {
 	return &b, nil
 }
 
-// Load save the configuration to file.
+// Save writes the configuration to file.
 func Save(b *Backups) error {
 	configDir := ensureConfigDir()
 	filename := filepath.Join(configDir, "b.json")
@@ -79,7 +79,7 @@ func (b *Backups) PushDir(orig, bak string) {
 	b.Snapshots[orig] = append(b.Snapshots[orig], bak)
 }
 
-// Pop pops a directory from the stack.
+// PopDir pops a directory from the stack.
 func (b *Backups) PopDir(orig string) (string, bool) {
 	if snapshots := b.Snapshots[orig]; len(snapshots) == 0 {
 		return "", false
