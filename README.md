@@ -7,35 +7,27 @@
 
 alessio's UNIX Convenience Tools.
 
-# What's in This Repo?
-
-## elvoke
-
-Run or postpone a command, depending on how much time elapsed from the last successful run.
-
-### Installation
+# Installation
 
 Just run:
 
 ```
-$ go get github.com/alessio/unixtools/elvoke
+$ go get github.com/alessio/unixtools/cmd/...
 ```
 
-### Credits
+# What's in This Repo?
+
+## elvoke
 
 This is a Golang implementation of [Jakub Wilk's elvoke](https://github.com/jwilk/elvoke).
 
+Run or postpone a command, depending on how much time elapsed from the last successful run.
+
 ## refiles
 
+This was inspired by @niemeyer's [remv](http://niemeyer.net/remv).
+
 Rename files in directories that match a given pattern.
-
-### Installation
-
-Just
-
-```
-go get github.com/alessio/unixtools/refiles
-```
 
 ### Options
 
@@ -51,35 +43,13 @@ Run `refiles -help` to print the following help screen:
     	enable verbose output
 ```
 
-### Credits
-
-Written by Alessio Treglia.
-Inspired by @niemeyer's [remv](http://niemeyer.net/remv).
-
 ## popbak, pushbak
 
 Manage a stack of directories backups. **pushbak** makes backups of a directory, **popbak**
 restores the last backup available.
-
-### Installation
-
-Just
-
-```
-go get github.com/alessio/unixtools/pushback
-go get github.com/alessio/unixtools/popback
-```
 
 ## seq
 
 Golang implementation of the UNIX `seq` command. It prints sequences of numbers.
 
 This is a Go implementation of the UNIX `seq` command.
-
-### Installation
-
-Just
-
-```
-go get github.com/alessio/unixtools/seq
-```
