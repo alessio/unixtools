@@ -1,4 +1,4 @@
-[![Travis-CI Status](https://api.travis-ci.org/alessio/unixtools.png?branch=main)](http://travis-ci.org/#!/alessio/unixtools)
+![Build](https://github.com/alessio/unixtools/workflows/Build/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/alessio/unixtools)](https://goreportcard.com/report/github.com/alessio/unixtools)
 [![license](https://img.shields.io/github/license/alessio/unixtools.svg)](https://github.com/alessio/unixtools/blob/master/LICENSE)
 [![LoC](https://tokei.rs/b1/github/alessio/unixtools)](https://github.com/alessio/unixtools)
