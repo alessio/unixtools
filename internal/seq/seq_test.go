@@ -25,6 +25,7 @@ func Test_IntSequence(t *testing.T) {
 		{"10 to 5", args{10, 1, 5, 5}, 6, false},
 		{"0 to 100, out of bounds", args{0, 1, 100, 2}, 100, true},
 		{"0 to 100, nil width", args{0, 1, 100, 0}, 101, false},
+		{"0 to 100, nil width", args{0, 5, 100, 0}, 21, false},
 		{"wrong args, out of bounds", args{10, 1, 20, 1}, 0, true},
 		{"-5 to 5", args{-5, 1, 5, 2}, 11, false},
 		{"5 to -5", args{5, 1, -5, 2}, 11, false},
