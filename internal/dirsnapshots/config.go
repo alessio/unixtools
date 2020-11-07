@@ -13,6 +13,7 @@ const (
 	version          = 0
 )
 
+// Load reads the configuration from file.
 func Load() (*Backups, error) {
 	configDir := ensureConfigDir()
 	filename := filepath.Join(configDir, "config.json")
@@ -41,6 +42,7 @@ func Load() (*Backups, error) {
 	return &b, nil
 }
 
+// Load save the configuration to file.
 func Save(b *Backups) error {
 	configDir := ensureConfigDir()
 	filename := filepath.Join(configDir, "b.json")
@@ -57,6 +59,7 @@ func Save(b *Backups) error {
 	return nil
 }
 
+// Backups defines the programs configuration.
 type Backups struct {
 	Snapshots    map[string][]string
 	Version      uint8
@@ -71,10 +74,12 @@ func newConfig(snapshotsDir string) *Backups {
 	}
 }
 
+// PushDir pushes a directory the stack.
 func (b *Backups) PushDir(orig, bak string) {
 	b.Snapshots[orig] = append(b.Snapshots[orig], bak)
 }
 
+// Pop pops a directory from the stack.
 func (b *Backups) PopDir(orig string) (string, bool) {
 	if snapshots := b.Snapshots[orig]; len(snapshots) == 0 {
 		return "", false
@@ -86,6 +91,7 @@ func (b *Backups) PopDir(orig string) (string, bool) {
 	return elem, true
 }
 
+// SnapshotsDir returns the snapshots base path.
 func (b *Backups) SnapshotsDir() string { return b.snapshotsDir }
 
 // ensureConfigDir ensures that the user's Backups directory
