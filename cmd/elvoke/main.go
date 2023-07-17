@@ -130,8 +130,11 @@ func ensureCache() {
 	}
 
 	cachedir = filepath.Join(cachedir, "elvoke")
+	mustMkDirAll(cachedir)
+}
 
-	if err := os.MkdirAll(cachedir, 0755); err != nil {
+func mustMkDirAll(s string) {
+	if err := os.MkdirAll(s, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
 }
