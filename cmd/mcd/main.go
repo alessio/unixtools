@@ -43,7 +43,7 @@ func main() {
 
 func usage() {
 	usageString := `Usage: mcd DIR
-Change the current directory DIR. Also, create intermediate directories as required.
+Change the current directory to DIR. Also, create intermediate directories as required.
 
 Options:`
 	_, _ = fmt.Fprintln(os.Stderr, usageString)
