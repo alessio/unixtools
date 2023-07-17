@@ -23,6 +23,10 @@ This is a Golang implementation of [Jakub Wilk's elvoke](https://github.com/jwil
 
 Run or postpone a command, depending on how much time elapsed from the last successful run.
 
+## mcd
+
+Change the current directory to DIR. Also, create intermediate directories as required.
+
 ## refiles
 
 This was inspired by @niemeyer's [remv](http://niemeyer.net/remv).
