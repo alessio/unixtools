@@ -28,7 +28,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if 	flag.Parse(); flag.NArg() != 1 {
+	if flag.Parse(); flag.NArg() != 1 {
 		log.Fatal("invalid arguments")
 	}
 
@@ -50,4 +50,3 @@ Options:`
 
 	flag.PrintDefaults()
 }
-
