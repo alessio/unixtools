@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -124,14 +125,38 @@ func main() {
 func ensureCache() {
 	var err error
 
+	// Look up ELVOKE_HOME first for compatibility with upstream's.
+	cachedir = os.Getenv("ELVOKE_HOME")
+	if cachedir != "" {
+		return
+	}
+
+	// Use $HOME/.elvoke if it exists
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cachedir = path.Join(homedir, ".elvoke")
+
+	info, err := os.Stat(cachedir)
+	if info.IsDir() && err == nil {
+		return
+	}
+
+	// Fallback to $XDG_CACHE_DIR/elvoke
+	// It creates the directory if it does not exist.
 	cachedir, err = os.UserCacheDir()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	cachedir = filepath.Join(cachedir, "elvoke")
+	mustMkDirAll(cachedir)
+}
 
-	if err := os.MkdirAll(cachedir, 0755); err != nil {
+func mustMkDirAll(s string) {
+	if err := os.MkdirAll(s, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
 }
