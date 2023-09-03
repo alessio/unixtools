@@ -1,0 +1,98 @@
+project_name: unixtools
+before:
+  hooks:
+  - make distclean
+  - go mod verify
+  - go mod tidy
+  - go generate ./...
+
+gomod:
+  proxy: true
+  env:
+    - GOPROXY=https://proxy.golang.org,direct
+    - GOSUMDB=sum.golang.org
+  mod: readonly
+
+builds:
+  - main: ./cmd/elvoke
+    id: "elvoke"
+    binary: elvoke
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+      - freebsd
+
+  - main: ./cmd/mcd
+    id: "mcd"
+    binary: mcd
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+      - freebsd
+
+  - main: ./cmd/popbak
+    id: "popbak"
+    binary: popbak
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+      - freebsd
+
+  - main: ./cmd/pushbak
+    id: "pushbak"
+    binary: pushbak
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+      - freebsd
+
+  - main: ./cmd/refiles
+    id: "refiles"
+    binary: refiles
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+      - freebsd
+
+  - main: ./cmd/seq
+    id: "seq"
+    binary: seq
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+      - freebsd
+
+archives:
+  - format: tar.gz
+    wrap_in_directory: true
+    format_overrides:
+    - goos: windows
+      format: zip
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-UNRELEASED"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
