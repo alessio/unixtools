@@ -57,3 +57,27 @@ func TestRemoveDir(t *testing.T) {
 		})
 	}
 }
+
+func TestPushDirIfNotInPath(t *testing.T) {
+	type args struct {
+		path string
+		s    string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"empty", args{"", ""}, "."},
+		{"push ok", args{"hello:world:x:/y", "/Y"}, "/Y:hello:world:x:/y"},
+		{"push no op", args{"hello:world:x:/y", "/y/"}, "hello:world:x:/y"},
+		{"push to empty", args{"", "/y///"}, "/y"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PushDirIfNotInPath(tt.args.path, tt.args.s); got != tt.want {
+				t.Errorf("PushDirIfNotInPath() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
