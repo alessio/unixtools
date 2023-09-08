@@ -18,7 +18,8 @@ jobs:
     - run: go version
     - run: go build ./...
     - run: go test -race -cover -covermode=atomic -coverprofile=coverage.out ./...
-    - uses: codecov/codecov-action@v1
+    - uses: codecov/codecov-action@v3
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.out
         verbose: true
