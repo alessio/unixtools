@@ -14,6 +14,28 @@ gomod:
   mod: readonly
 
 builds:
+  - main: ./cmd/addpath
+    id: "addpath"
+    binary: addpath
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+      - freebsd
+
+  - main: ./cmd/delpath
+    id: "delpath"
+    binary: delpath
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+      - freebsd
+
   - main: ./cmd/elvoke
     id: "elvoke"
     binary: elvoke
