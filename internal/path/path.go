@@ -6,18 +6,7 @@ import (
 )
 
 func PushDirIfNotInPath(path string, s string) string {
-	s = normalizePath(s)
-	if path == "" {
-		return s
-	}
-
-	for _, d := range strings.Split(path, ":") {
-		if s == normalizePath(d) {
-			return path
-		}
-	}
-
-	return strings.Join([]string{s, path}, ":")
+	return AddDir(path, s, false)
 }
 
 func AddDir(path string, s string, append bool) string {
