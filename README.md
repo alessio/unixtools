@@ -57,3 +57,7 @@ restores the last backup available.
 Golang implementation of the UNIX `seq` command. It prints sequences of numbers.
 
 This is a Go implementation of the UNIX `seq` command.
+
+## addpath, delpath
+
+Utilityies to handle PATH-like variable modifications.
