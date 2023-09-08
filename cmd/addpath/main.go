@@ -18,9 +18,11 @@ var (
 
 func init() {
 	detectAppendMode()
+
 	if !appendMode {
 		flag.BoolVar(&appendMode, "append", false, "append DIR to ENVVAR.")
 	}
+
 	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
 	flag.Usage = usage
 }

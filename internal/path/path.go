@@ -45,7 +45,8 @@ func RemoveDir(path string, s string) string {
 		return path
 	}
 
-	var newPath []string
+	newPath := make([]string, 0)
+
 	for _, d := range strings.Split(path, ":") {
 		if s == normalizePath(d) {
 			continue

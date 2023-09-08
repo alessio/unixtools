@@ -23,6 +23,7 @@ func main() {
 		envvar string
 		dir    string
 	)
+
 	log.SetFlags(0)
 	log.SetPrefix("delpath: ")
 	log.SetOutput(os.Stderr)
