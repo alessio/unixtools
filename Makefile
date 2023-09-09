@@ -4,6 +4,7 @@ PKGS := $(shell go list ./cmd/...)
 BINS =  $(shell basename $(PKGS))
 COVERAGE_REPORT_FILENAME ?= coverage.out
 BUILDDIR ?= $(CURDIR)/build
+CODESIGN_IDENTIY ?= none
 
 ifeq (,$(findstring nostrip,$(BUILD_OPTIONS)))
   ldflags += -w -s
@@ -60,6 +61,7 @@ generate-stamp: go.sum
 
 distclean: clean
 	rm -rf dist/
+	rm -rf unixtools.dmg
 
 clean:
 	rm -rf $(BUILDDIR)
@@ -70,4 +72,10 @@ clean:
 list:
 	@echo $(BINS) | tr ' ' '\n'
 
-.PHONY: all clean check distclean build list
+macos-codesign: build
+	codesign --verbose -s $(CODESIGN_IDENTITY) --options=runtime ./build/*
+
+unixtools.dmg: macos-codesign
+	create-dmg --volname unixtools --codesign $(CODESIGN_IDENTITY) --sandbox-safe $@ ./build
+
+.PHONY: all clean check distclean build list macos-codesign

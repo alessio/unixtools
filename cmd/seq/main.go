@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/alessio/unixtools/internal/seq"
+	"github.com/alessio/unixtools/internal/version"
 )
 
 var (
@@ -92,7 +93,7 @@ func handleHelpAndVersionModes() {
 	}
 
 	if versionMode {
-		version()
+		version.PrintWithCopyright()
 		os.Exit(0)
 	}
 }
@@ -115,9 +116,4 @@ Print numbers from FIRST to LAST, in steps of INCREMENT.
 	_, _ = fmt.Fprintln(os.Stderr, usageString)
 
 	flag.PrintDefaults()
-}
-
-func version() {
-	_, _ = fmt.Fprintln(os.Stderr, "alessio's seq program, version 1.0.0")
-	_, _ = fmt.Fprintln(os.Stderr, "Copyright (C) 2020 Alessio Treglia <alessio@debian.org>")
 }
