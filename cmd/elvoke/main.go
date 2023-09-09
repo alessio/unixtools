@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/alessio/unixtools/internal/version"
 )
 
 var (
@@ -19,6 +21,7 @@ var (
 	cachedir       string
 	failOnPostpone bool
 	debug          bool
+	versionMode    bool
 	interval       time.Duration
 
 	printDebug = func(_ string, _ ...interface{}) {}
@@ -30,6 +33,7 @@ func init() {
 	flag.BoolVar(&failOnPostpone, "fail-on-postpone", false, "exit with non-zero code when postponing.")
 	flag.BoolVar(&debug, "debug", false, "print debug information.")
 	flag.DurationVar(&interval, "interval", 1*time.Hour, "minimum interval between invocations of the same command.")
+	flag.BoolVar(&versionMode, "version", false, "output version information and exit.")
 	flag.Usage = usage
 }
 
@@ -38,6 +42,11 @@ func main() {
 	log.SetPrefix("elvoke: ")
 	log.SetOutput(os.Stderr)
 	flag.Parse()
+
+	if versionMode {
+		version.PrintWithCopyright()
+		os.Exit(0)
+	}
 
 	if debug {
 		printDebug = log.Printf

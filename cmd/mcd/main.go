@@ -5,24 +5,31 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/alessio/unixtools/internal/version"
 )
 
-var helpMode bool
+var (
+	helpMode    bool
+	versionMode bool
+	mode        uint
+)
 
 func init() {
 	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
+	flag.BoolVar(&versionMode, "version", false, "output version information and exit.")
+
 	flag.Usage = usage
+	flag.ErrHelp = nil
 }
 
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix("mcd: ")
 	log.SetOutput(os.Stderr)
+	flag.Parse()
 
-	if helpMode {
-		usage()
-		os.Exit(0)
-	}
+	handleHelpAndVersionModes()
 
 	if _, err := os.Getwd(); err != nil {
 		log.Fatal(err)
@@ -39,6 +46,17 @@ func main() {
 	if err := os.Chdir(flag.Arg(0)); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func handleHelpAndVersionModes() {
+	switch {
+	case helpMode:
+		usage()
+	case versionMode:
+		version.PrintWithCopyright()
+	}
+
+	os.Exit(0)
 }
 
 func usage() {
