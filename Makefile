@@ -78,4 +78,4 @@ macos-codesign: build
 unixtools.dmg: macos-codesign
 	create-dmg --volname unixtools --codesign $(CODESIGN_IDENTITY) --sandbox-safe $@ ./build
 
-.PHONY: all clean check distclean build list macos-codesign
+.PHONY: all clean check distclean build list macos-codesign generate
