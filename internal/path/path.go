@@ -1,7 +1,6 @@
 package path
 
 import (
-	"path"
 	"strings"
 )
 
@@ -45,8 +44,4 @@ func RemoveDir(path string, s string) string {
 	}
 
 	return strings.Join(newPath, ":")
-}
-
-func normalizePath(s string) string {
-	return path.Clean(strings.TrimRight(s, "/"))
 }
