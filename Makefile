@@ -31,13 +31,14 @@ ifdef verbose
 VERBOSE = -v
 endif
 
-all: build check
+all: generate build check
 
 BUILD_TARGETS := build install
 
+build: generate
 build: BUILD_ARGS=-o $(BUILDDIR)/
 
-$(BUILD_TARGETS): generate $(BUILDDIR)/
+$(BUILD_TARGETS): $(BUILDDIR)/
 	go $@ $(VERBOSE) -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 $(BUILDDIR)/:
@@ -67,15 +68,28 @@ clean:
 	rm -rf $(BUILDDIR)
 	rm -f \
 	   $(COVERAGE_REPORT_FILENAME) \
-	   generate-stamp
+	   generate-stamp version-stamp
+
+version-stamp: generate
+	cp internal/version/version.txt $@
 
 list:
 	@echo $(BINS) | tr ' ' '\n'
 
 macos-codesign: build
-	codesign --verbose -s $(CODESIGN_IDENTITY) --options=runtime ./build/*
+	codesign --verbose -s $(CODESIGN_IDENTITY) --options=runtime $(BUILDDIR)/*
 
-unixtools.dmg: macos-codesign
-	create-dmg --volname unixtools --codesign $(CODESIGN_IDENTITY) --sandbox-safe $@ ./build
+unixtools.pkg: version-stamp macos-codesign
+	pkgbuild --identifier io.asscrypto.unixtools \
+		--install-location ./Library/ --root $(BUILDDIR) $@
+
+unixtools.dmg: version-stamp macos-codesign
+	VERSION=$(shell cat version-stamp); \
+	mkdir -p dist/unixtools-$${VERSION}/bin ; \
+	cp -a $(BUILDDIR)/* dist/unixtools-$${VERSION}/bin/ ; \
+	chmod 0755 dist/unixtools-$${VERSION}/bin/* ; \
+	create-dmg --volname unixtools --codesign $(CODESIGN_IDENTITY) \
+		--sandbox-safe --no-internet-enable \
+		$@ dist/unixtools-$${VERSION}
 
 .PHONY: all clean check distclean build list macos-codesign generate
