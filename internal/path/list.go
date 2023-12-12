@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var ListSeparator = string(os.PathListSeparator)
+var ListSeparator = string(filepath.ListSeparator)
 
 type dirList struct {
 	lst []string

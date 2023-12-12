@@ -5,6 +5,7 @@ BINS =  $(shell basename $(PKGS))
 COVERAGE_REPORT_FILENAME ?= coverage.out
 BUILDDIR ?= $(CURDIR)/build
 CODESIGN_IDENTIY ?= none
+UNAME := $(shell uname -s)
 
 ifeq (,$(findstring nostrip,$(BUILD_OPTIONS)))
   ldflags += -w -s
@@ -14,6 +15,11 @@ ldflags := $(strip $(ldflags))
 
 ifneq (,$(ldflags))
   BUILD_FLAGS += -ldflags '$(ldflags)'
+endif
+
+# check if -race is support
+ifeq (,$(findstring OpenBSD,$(UNAME)))
+  RACE = -race
 endif
 
 # check for nostrip option
@@ -46,7 +52,7 @@ $(BUILDDIR)/:
 check: $(COVERAGE_REPORT_FILENAME)
 
 $(COVERAGE_REPORT_FILENAME): generate
-	go test $(VERBOSE) -mod=readonly -race -cover -covermode=atomic -coverprofile=$@ ./...
+	go test $(VERBOSE) -mod=readonly $(RACE) -cover -covermode=atomic -coverprofile=$@ ./...
 
 go.sum: go.mod
 	echo "Ensure dependencies have not been modified ..." >&2

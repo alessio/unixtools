@@ -3,9 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/alessio/unixtools/internal/path"
 	"log"
 	"os"
+	"path/filepath"
+
+	"github.com/alessio/unixtools/internal/path"
 )
 
 const (
@@ -24,7 +26,7 @@ var (
 
 func init() {
 	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
-	flag.StringVar(&pathListSep, "s", string(os.PathListSeparator), "path list separator.")
+	flag.StringVar(&pathListSep, "s", string(filepath.ListSeparator), "path list separator.")
 	flag.StringVar(&envVar, "e", "PATH", "input environment variable")
 	flag.Usage = usage
 	flag.CommandLine.SetOutput(os.Stderr)
