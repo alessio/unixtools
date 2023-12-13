@@ -101,15 +101,18 @@ func appendPath(p string) {
 }
 
 func handleHelpAndVersionModes() {
-	if helpMode {
-		usage()
-		os.Exit(0)
+	if !helpMode && !versionMode {
+		return
 	}
 
-	if versionMode {
+	switch {
+	case helpMode:
+		usage()
+	case versionMode:
 		version.PrintWithCopyright()
-		os.Exit(0)
 	}
+
+	os.Exit(0)
 }
 
 func usage() {
