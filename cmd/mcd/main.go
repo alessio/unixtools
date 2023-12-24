@@ -12,7 +12,6 @@ import (
 var (
 	helpMode    bool
 	versionMode bool
-	mode        uint
 )
 
 func init() {

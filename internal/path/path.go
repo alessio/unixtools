@@ -1,6 +1,7 @@
 package path
 
 import (
+	"path/filepath"
 	"strings"
 )
 
@@ -9,13 +10,13 @@ func PushDirIfNotInPath(path string, s string) string {
 }
 
 func AddDir(path string, s string, append bool) string {
-	s = normalizePath(s)
+	s = filepath.Clean(s)
 	if path == "" {
 		return s
 	}
 
 	for _, d := range strings.Split(path, ":") {
-		if s == normalizePath(d) {
+		if s == filepath.Clean(d) {
 			return path
 		}
 	}
@@ -28,7 +29,7 @@ func AddDir(path string, s string, append bool) string {
 }
 
 func RemoveDir(path string, s string) string {
-	s = normalizePath(s)
+	s = filepath.Clean(s)
 	if s == "" || path == "" {
 		return path
 	}
@@ -36,7 +37,7 @@ func RemoveDir(path string, s string) string {
 	newPath := make([]string, 0)
 
 	for _, d := range strings.Split(path, ":") {
-		if s == normalizePath(d) {
+		if s == filepath.Clean(d) {
 			continue
 		}
 

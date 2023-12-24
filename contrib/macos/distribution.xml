@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <pkg-ref id="io.asscrypto.unixtools"/>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="io.asscrypto.unixtools"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="io.asscrypto.unixtools" visible="false">
+        <pkg-ref id="io.asscrypto.unixtools"/>
+    </choice>
+    <pkg-ref id="io.asscrypto.unixtools" version="0" onConclusion="none">pkg.pkg</pkg-ref>
+</installer-gui-script>
