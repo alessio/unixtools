@@ -20,3 +20,5 @@ dist/
 build/
 generate-stamp
 .DS_Store
+
+.envrc
