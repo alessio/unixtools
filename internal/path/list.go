@@ -5,75 +5,105 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"github.com/alessio/shellescape"
 )
 
-var ListSeparator = string(os.PathListSeparator)
-
-type dirList struct {
-	lst []string
+type pathLst struct {
+	dirs   []string
+	envvar string
 }
 
-func newDirList(lst []string) *dirList {
-	return &dirList{lst: lst}
+func (p *pathLst) setDirs(dirs ...string) {
+	if len(dirs) == 0 {
+		return
+	}
+
+	var cleanDirs []string
+	for _, d := range dirs {
+		cleanDirs = append(cleanDirs, filepath.Clean(d))
+	}
+
+	p.dirs = cleanDirs
 }
 
-func NewPathList(v string) List {
-	return newDirList(makePathList(os.Getenv(v)))
+func NewDirList(dirs ...string) DirList {
+	return &pathLst{dirs: dirs}
 }
 
-func (p *dirList) String() interface{} {
-	return strings.Join(p.lst, ListSeparator)
+func (p *pathLst) EnvironmentVar() string {
+	return p.envvar
 }
 
-func (p *dirList) StringSlice() []string {
-	return p.lst
+func (p *pathLst) SetEnvvar(varname string) {
+	p.dirs = filepath.SplitList(
+		strings.Trim(os.Getenv(varname), string(filepath.ListSeparator)))
+	p.envvar = varname
 }
 
-func (p *dirList) Prepend(path string) bool {
-	cleanPath := normalizePath(path)
-	if idx := slices.Index(p.lst, cleanPath); idx == -1 {
-		p.lst = append([]string{cleanPath}, p.lst...)
+func (p *pathLst) SetDirs(dirs ...string) {
+	p.dirs = dirs
+}
+
+//func (p *pathLst) Parse(v string) { p.dirs = p.makePathList(v) }
+
+func (p *pathLst) String() string {
+	var b strings.Builder
+	for _, s := range p.dirs {
+		b.WriteString(shellescape.Quote(s))
+		b.WriteRune(filepath.ListSeparator)
+	}
+	return b.String()[:len(b.String())-1]
+	//	return strings.Join(p.dirs, ListSeparator)
+}
+
+func (p *pathLst) StringSlice() []string {
+	return p.dirs
+}
+
+func (p *pathLst) Prepend(path string) bool {
+	cleanPath := filepath.Clean(path)
+	if idx := slices.Index(p.dirs, cleanPath); idx == -1 {
+		p.dirs = append([]string{cleanPath}, p.dirs...)
 		return true
 	}
 
 	return false
 }
 
-func (p *dirList) Append(path string) bool {
-	cleanPath := normalizePath(path)
-	if idx := slices.Index(p.lst, cleanPath); idx == -1 {
-		p.lst = append(p.lst, cleanPath)
+func (p *pathLst) Append(path string) bool {
+	cleanPath := filepath.Clean(path)
+	if idx := slices.Index(p.dirs, cleanPath); idx == -1 {
+		p.dirs = append(p.dirs, cleanPath)
 		return true
 	}
 
 	return false
 }
 
-func (p *dirList) Drop(path string) bool {
-	cleanPath := normalizePath(path)
-	if idx := slices.Index(p.lst, cleanPath); idx != -1 {
-		p.lst = slices.Delete(p.lst, idx, idx+1)
+func (p *pathLst) Drop(path string) bool {
+	cleanPath := filepath.Clean(path)
+	if idx := slices.Index(p.dirs, cleanPath); idx != -1 {
+		p.dirs = slices.Delete(p.dirs, idx, idx+1)
 		return true
 	}
 
 	return false
 }
 
-func makePathList(pathStr string) []string {
-	if pathStr == "" {
-		return nil
-	}
+func (p *pathLst) Slice() []string { return p.dirs }
 
-	rawList := strings.Split(pathStr, ListSeparator)
-	cleanList := make([]string, len(rawList))
-
-	for i, s := range rawList {
-		cleanList[i] = normalizePath(s)
-	}
-
-	return cleanList
-}
-
-func normalizePath(s string) string {
-	return filepath.Clean(s)
-}
+//func (p *pathLst) makePathList(pathStr string) []string {
+//	if pathStr == "" {
+//		return nil
+//	}
+//
+//	rawList := strings.Split(pathStr, string(filepath.ListSeparator))
+//	cleanList := make([]string, len(rawList))
+//
+//	for i, s := range rawList {
+//		cleanList[i] = filepath.Clean(s)
+//	}
+//
+//	return cleanList
+//}

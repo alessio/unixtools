@@ -6,83 +6,113 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/alessio/unixtools/internal/path"
 	"github.com/alessio/unixtools/internal/version"
 )
 
 const (
-	progName = "pathctl"
+	programme = "pathctl"
 )
 
 var (
-	helpMode    bool
-	versionMode bool
-	pathListSep string
+	helpMode     bool
+	versionMode  bool
+	listMode     bool
+	noprefixMode bool
+	pathListSep  string
 )
 
 var (
 	envVar string
-	paths  path.List
+	paths  path.DirList
 )
+
+var cmdHandlers map[string]func()
 
 func init() {
 	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
 	flag.BoolVar(&versionMode, "version", false, "output version information and exit.")
-	flag.StringVar(&pathListSep, "s", string(os.PathListSeparator), "path list separator.")
-	flag.StringVar(&envVar, "e", "PATH", "input environment variable")
+	flag.BoolVar(&noprefixMode, "noprefix", false, "output the variable contents only.")
+	flag.StringVar(&pathListSep, "sep", string(filepath.ListSeparator), "path list separator.")
+	flag.StringVar(&envVar, "E", "PATH", "input environment variable")
 	flag.Usage = usage
 	flag.CommandLine.SetOutput(os.Stderr)
+
+	cmdHandlers = func() map[string]func() {
+		hdlrList := func() { list() }
+		hdlrAppend := func() { appendPath(flag.Arg(1)) }
+		hdlrDrop := func() { drop(flag.Arg(1)) }
+		hdlrPrepend := func() { prependPath(flag.Arg(1)) }
+
+		return map[string]func(){
+			"list":              hdlrList,
+			"apppend":           hdlrAppend,
+			"drop":              hdlrDrop,
+			"prepend":           hdlrPrepend,
+			"appendPathctlDir":  func() { appendPath(exePath()) },
+			"prependPathctlDir": func() { prependPath(exePath()) },
+
+			// aliases
+			"a": hdlrAppend,
+			"d": hdlrDrop,
+			"p": hdlrPrepend,
+			"l": hdlrList,
+		}
+	}()
 }
 
 func main() {
 	log.SetFlags(0)
-	log.SetPrefix(fmt.Sprintf("%s: ", progName))
+	log.SetPrefix(fmt.Sprintf("%s: ", programme))
 	log.SetOutput(os.Stderr)
 	flag.Parse()
 
 	handleHelpAndVersionModes()
 
-	paths = path.NewPathList(envVar)
+	paths := path.NewDirList()
+	paths.SetEnvvar(envVar)
 
 	if flag.NArg() < 1 {
-		list()
+		printPathList()
 		os.Exit(0)
 	}
 
-	if flag.NArg() == 1 {
-		switch flag.Arg(0) {
-		case "list", "l":
-			list()
-		case "appendPathctlDir", "apd":
-			appendPath(exePath())
-		case "prependPathctlDir", "ppd":
-			prepend(exePath())
-		default:
-			log.Fatalf("unrecognized command: %s", flag.Arg(0))
-		}
+	if handler, ok := cmdHandlers[flag.Arg(0)]; ok {
+		handler()
 	} else {
-		switch flag.Arg(0) {
-		case "prepend", "p":
-			prepend(flag.Arg(1))
-		case "drop", "d":
-			drop(flag.Arg(1))
-		case "append", "a":
-			appendPath(flag.Arg(1))
-		}
+		log.Fatalf("unrecognized command: %s", flag.Arg(0))
 	}
 
-	fmt.Println(paths.String())
+	printPathList()
+}
+
+func printPathList() {
+	var sb strings.Builder
+	switch {
+	case listMode:
+		for _, p := range paths.Slice() {
+			fmt.Println(p)
+		}
+	case noprefixMode:
+		goto printout
+	default:
+		sb.WriteString(fmt.Sprintf("%s=", envVar))
+	}
+
+printout:
+	sb.WriteString(paths.String())
+	fmt.Println(sb.String())
 }
 
 func list() {
-	for _, p := range paths.StringSlice() {
+	for _, p := range paths.Slice() {
 		fmt.Println(p)
 	}
 }
 
-func prepend(p string) {
-	//oldPath := pathEnvvar
+func prependPath(p string) {
 	if ok := paths.Prepend(p); !ok {
 		log.Println("the path already exists")
 	}
@@ -125,10 +155,10 @@ Commands:
    append, a       append a path to the end
    drop, d         drop a path
    list, l         list the paths
-   prepend, p      prepend a path to the list
+   prepend, p      prependPath a path to the list
 
 Options:
-`, progName)
+`, programme)
 	_, _ = fmt.Fprintln(os.Stderr, s)
 
 	flag.PrintDefaults()

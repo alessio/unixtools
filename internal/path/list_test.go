@@ -1,31 +1,29 @@
 package path_test
 
 import (
-	"fmt"
 	"github.com/alessio/unixtools/internal/path"
 	"github.com/stretchr/testify/require"
+	"strings"
 	"testing"
 )
 
-func TestPathList_Prepend(t *testing.T) {
-	envVarName := fmt.Sprintf("TEST_%s", t.Name())
-	t.Setenv(envVarName, "/var/:/root/config:/Programs///")
-	lst := path.NewPathList(envVarName)
+func TestList_Prepend(t *testing.T) {
+	lst := path.NewDirList()
+	lst.SetDirs("/var", "/root/config", "/Programs///")
 
-	require.Equal(t, lst.String(), "/var:/root/config:/Programs")
+	require.Equal(t, "/var:/root/config:/Programs", lst.String())
 
 	require.True(t, lst.Prepend("/usr/local/go/bin"))
 	require.False(t, lst.Prepend("/usr/local/go/bin"))
 	require.False(t, lst.Prepend("/usr///local///go/bin/"))
 
 	require.Equal(t, "/usr/local/go/bin:/var:/root/config:/Programs", lst.String())
-	require.Equal(t, []string{"/usr/local/go/bin", "/var", "/root/config", "/Programs"}, lst.StringSlice())
+	require.Equal(t, []string{"/usr/local/go/bin", "/var", "/root/config", "/Programs"}, lst.Slice())
 }
 
-func TestPathList_Append(t *testing.T) {
-	envVarName := fmt.Sprintf("TEST_%s", t.Name())
-	t.Setenv(envVarName, "/var/:/root/config:/Programs///")
-	lst := path.NewPathList(envVarName)
+func TestList_Append(t *testing.T) {
+	lst := path.NewDirList()
+	lst.SetDirs("/var", "/root/config", "/Programs///")
 
 	require.Equal(t, "/var:/root/config:/Programs", lst.String())
 
@@ -34,14 +32,12 @@ func TestPathList_Append(t *testing.T) {
 	require.False(t, lst.Append("/usr///local///go/bin/"))
 
 	require.Equal(t, "/var:/root/config:/Programs:/usr/local/go/bin", lst.String())
-	require.Equal(t, []string{"/var", "/root/config", "/Programs", "/usr/local/go/bin"}, lst.StringSlice())
+	require.Equal(t, []string{"/var", "/root/config", "/Programs", "/usr/local/go/bin"}, lst.Slice())
 }
 
-func TestPathList_Drop(t *testing.T) {
-	envVarName := fmt.Sprintf("TEST_%s", t.Name())
-	t.Setenv(envVarName,
-		"/usr/local/bin:/home/user/.local/bin/:/usr/local/sbin:/var:/root")
-	lst := path.NewPathList(envVarName)
+func TestList_Drop(t *testing.T) {
+	lst := path.NewDirList()
+	lst.SetDirs(strings.Split("/usr/local/bin:/home/user/.local/bin/:/usr/local/sbin:/var:/root", ":")...)
 
 	require.Equal(t, "/usr/local/bin:/home/user/.local/bin:/usr/local/sbin:/var:/root", lst.String())
 	require.False(t, lst.Drop("/etc")) // non existing
@@ -50,5 +46,24 @@ func TestPathList_Drop(t *testing.T) {
 	require.True(t, lst.Drop("/root/./"))
 
 	require.Equal(t, "/usr/local/bin:/usr/local/sbin:/var", lst.String())
-	require.Equal(t, []string{"/usr/local/bin", "/usr/local/sbin", "/var"}, lst.StringSlice())
+	require.Equal(t, []string{"/usr/local/bin", "/usr/local/sbin", "/var"}, lst.Slice())
+}
+
+func TestList_String(t *testing.T) {
+	tests := []struct {
+		name string
+		lst  string
+		want string
+	}{
+		{"simple", "/usr/local/bin:/usr/sbin", "/usr/local/bin:/usr/sbin"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(ttt *testing.T) {
+			p := path.NewDirList()
+			p.SetDirs(strings.Split(tt.lst, ":")...)
+			if got := p.String(); got != tt.want {
+				ttt.Errorf("String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
