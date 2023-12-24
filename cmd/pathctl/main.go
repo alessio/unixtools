@@ -26,10 +26,9 @@ var (
 
 var (
 	envVar string
-	paths  path.DirList
 )
 
-var cmdHandlers map[string]func()
+var cmdHandlers map[string]func(d path.List)
 
 func init() {
 	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
@@ -40,25 +39,25 @@ func init() {
 	flag.Usage = usage
 	flag.CommandLine.SetOutput(os.Stderr)
 
-	cmdHandlers = func() map[string]func() {
-		hdlrList := func() { list() }
-		hdlrAppend := func() { appendPath(flag.Arg(1)) }
-		hdlrDrop := func() { drop(flag.Arg(1)) }
-		hdlrPrepend := func() { prependPath(flag.Arg(1)) }
+	cmdHandlers = func() map[string]func(path.List) {
+		hList := func(d path.List) { list(d) }
+		hAppend := func(d path.List) { d.Append(flag.Arg(1)) }
+		hDrop := func(d path.List) { d.Drop(flag.Arg(1)) }
+		hPrepend := func(d path.List) { d.Prepend(flag.Arg(1)) }
 
-		return map[string]func(){
-			"list":              hdlrList,
-			"apppend":           hdlrAppend,
-			"drop":              hdlrDrop,
-			"prepend":           hdlrPrepend,
-			"appendPathctlDir":  func() { appendPath(exePath()) },
-			"prependPathctlDir": func() { prependPath(exePath()) },
+		return map[string]func(path.List){
+			"list":    hList,
+			"append":  hAppend,
+			"drop":    hDrop,
+			"prepend": hPrepend,
+			//"appendPathctlDir":  func() { appendPath(exePath()) },
+			//"prependPathctlDir": func() { prependPath(exePath()) },
 
 			// aliases
-			"a": hdlrAppend,
-			"d": hdlrDrop,
-			"p": hdlrPrepend,
-			"l": hdlrList,
+			"a": hAppend,
+			"d": hDrop,
+			"p": hPrepend,
+			"l": hList,
 		}
 	}()
 }
@@ -71,63 +70,50 @@ func main() {
 
 	handleHelpAndVersionModes()
 
-	paths := path.NewDirList()
-	paths.SetEnvvar(envVar)
+	dirs := path.NewList()
+	dirs.LoadEnv(envVar)
+	//fmt.Println(Paths.Slice())
 
 	if flag.NArg() < 1 {
-		printPathList()
+		list(dirs)
 		os.Exit(0)
 	}
 
 	if handler, ok := cmdHandlers[flag.Arg(0)]; ok {
-		handler()
+		handler(dirs)
+		printPathList(dirs)
 	} else {
 		log.Fatalf("unrecognized command: %s", flag.Arg(0))
 	}
-
-	printPathList()
 }
 
-func printPathList() {
-	var sb strings.Builder
+func printPathList(d path.List) {
+	//if len(Paths.Slice()) == 0 {
+	//	fmt.Println()
+	//	os.Exit(0)
+	//}
+
+	var sb = strings.Builder{}
+	sb.Reset()
+
+	printPrefix := !noprefixMode
+
 	switch {
 	case listMode:
-		for _, p := range paths.Slice() {
-			fmt.Println(p)
-		}
-	case noprefixMode:
-		goto printout
-	default:
+		sb.WriteString(strings.Join(d.Slice(), "\n"))
+		break
+	case printPrefix:
 		sb.WriteString(fmt.Sprintf("%s=", envVar))
+		fallthrough
+	default:
+		sb.WriteString(d.String())
 	}
 
-printout:
-	sb.WriteString(paths.String())
 	fmt.Println(sb.String())
 }
 
-func list() {
-	for _, p := range paths.Slice() {
-		fmt.Println(p)
-	}
-}
-
-func prependPath(p string) {
-	if ok := paths.Prepend(p); !ok {
-		log.Println("the path already exists")
-	}
-}
-
-func drop(p string) {
-	if ok := paths.Drop(p); !ok {
-		log.Println("the path already exists")
-	}
-}
-
-func appendPath(p string) {
-	if ok := paths.Append(p); !ok {
-		log.Println("the path already exists")
-	}
+func list(d path.List) {
+	printPathList(d)
 }
 
 func handleHelpAndVersionModes() {
