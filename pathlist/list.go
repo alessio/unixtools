@@ -52,11 +52,7 @@ type dirList struct {
 	src string
 }
 
-func (d *dirList) init() {
-	d.src = ""
-	d.lst = []string{}
-}
-
+// New creates a new path list.
 func New() List {
 	d := new(dirList)
 	d.init()
@@ -143,6 +139,11 @@ func (d *dirList) Prepend(path string) {
 	if !d.Contains(p) {
 		d.lst = slices.Insert(d.lst, 0, p)
 	}
+}
+
+func (d *dirList) init() {
+	d.src = ""
+	d.lst = []string{}
 }
 
 func (d *dirList) cleanPathVar() []string {

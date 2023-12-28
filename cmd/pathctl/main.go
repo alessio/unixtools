@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"al.essio.dev/pkg/tools/internal/version"
@@ -21,7 +20,6 @@ var (
 	versionMode  bool
 	listMode     bool
 	noprefixMode bool
-	pathListSep  string
 )
 
 var (
@@ -34,30 +32,41 @@ func init() {
 	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
 	flag.BoolVar(&versionMode, "version", false, "output version information and exit.")
 	flag.BoolVar(&noprefixMode, "noprefix", false, "output the variable contents only.")
-	flag.StringVar(&pathListSep, "sep", string(filepath.ListSeparator), "path list separator.")
+	flag.BoolVar(&listMode, "L", false, "use a newline character as path list separator.")
 	flag.StringVar(&envVar, "E", "PATH", "input environment variable")
 	flag.Usage = usage
 	flag.CommandLine.SetOutput(os.Stderr)
 
 	cmdHandlers = func() map[string]func(pathlist.List) {
-		hList := func(d pathlist.List) { list(d) }
 		hAppend := func(d pathlist.List) { d.Append(flag.Arg(1)) }
+		hMoveAppend := func(d pathlist.List) {
+			d.Drop(flag.Arg(1))
+			d.Append(flag.Arg(1))
+		}
 		hDrop := func(d pathlist.List) { d.Drop(flag.Arg(1)) }
-		hPrepend := func(d pathlist.List) { d.Prepend(flag.Arg(1)) }
+		hMovePrepend := func(d pathlist.List) {
+			d.Drop(flag.Arg(1))
+			d.Prepend(flag.Arg(1))
+		}
+		hPrepend := func(d pathlist.List) {
+			d.Prepend(flag.Arg(1))
+		}
 
 		return map[string]func(pathlist.List){
-			"list":    hList,
-			"append":  hAppend,
-			"drop":    hDrop,
-			"prepend": hPrepend,
+			"append":       hAppend,
+			"drop":         hDrop,
+			"prepend":      hPrepend,
+			"move-append":  hMoveAppend,
+			"move-prepend": hMovePrepend,
 			//"appendPathctlDir":  func() { appendPath(exePath()) },
 			//"prependPathctlDir": func() { prependPath(exePath()) },
 
 			// aliases
-			"a": hAppend,
-			"d": hDrop,
-			"p": hPrepend,
-			"l": hList,
+			"a":  hAppend,
+			"d":  hDrop,
+			"p":  hPrepend,
+			"mv": hMoveAppend,
+			"mp": hMovePrepend,
 		}
 	}()
 }
@@ -72,10 +81,9 @@ func main() {
 
 	dirs := pathlist.New()
 	dirs.LoadEnv(envVar)
-	//fmt.Println(Paths.Slice())
 
 	if flag.NArg() < 1 {
-		list(dirs)
+		printPathList(dirs)
 		os.Exit(0)
 	}
 
@@ -88,11 +96,6 @@ func main() {
 }
 
 func printPathList(d pathlist.List) {
-	//if len(Paths.Slice()) == 0 {
-	//	fmt.Println()
-	//	os.Exit(0)
-	//}
-
 	var sb = strings.Builder{}
 	sb.Reset()
 
@@ -138,11 +141,15 @@ simple, fast, and predictable.
 
 Commands:
 
-   append, a       append a path to the end
-   drop, d         drop a path
-   list, l         list the paths
-   prepend, p      prependPath a path to the list
-
+   append, a           append a path to the end of the list
+   move-append, ma     append a new path to the end of the list;
+                       if the list contains the path already then
+                       it will be moved to the end of the list
+   drop, d             drop a path
+   prepend, p          prepend a path to the list
+   move-prepend, mp    prepend a new path to the top of the list;
+                       if the list contains the path already then
+                       it will be moved to the top of the list
 Options:
 `, programme)
 	_, _ = fmt.Fprintln(os.Stderr, s)
@@ -151,8 +158,7 @@ Options:
 
 	_, _ = fmt.Fprintln(os.Stderr, `
 If COMMAND is not provided, it prints the contents of the PATH
-environment variable; the default output format is one path per
-line.`)
+environment variable.`)
 }
 
 //func exePath() string {
