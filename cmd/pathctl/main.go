@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/alessio/unixtools/internal/path"
-	"github.com/alessio/unixtools/internal/version"
+	"al.essio.dev/pkg/tools/internal/path"
+	"al.essio.dev/pkg/tools/internal/version"
 )
 
 const (

@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/alessio/unixtools/internal/path"
+	"al.essio.dev/pkg/tools/internal/path"
 )
 
 var (

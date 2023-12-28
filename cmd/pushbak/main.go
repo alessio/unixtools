@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/alessio/unixtools/internal/dirsnapshots"
-	"github.com/alessio/unixtools/internal/file"
+	"al.essio.dev/pkg/tools/internal/dirsnapshots"
+	"al.essio.dev/pkg/tools/internal/file"
 )
 
 var shelveMode bool

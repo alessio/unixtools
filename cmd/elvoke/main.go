@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alessio/unixtools/internal/version"
+	"al.essio.dev/pkg/tools/internal/version"
 )
 
 var (

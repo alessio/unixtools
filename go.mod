@@ -1,4 +1,4 @@
-module al.essio.dev/unixtools
+module al.essio.dev/pkg/tools
 
 go 1.21
 

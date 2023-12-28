@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/alessio/unixtools/internal/dirsnapshots"
+	"al.essio.dev/pkg/tools/internal/dirsnapshots"
 )
 
 func main() {

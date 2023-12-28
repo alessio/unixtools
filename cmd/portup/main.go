@@ -8,7 +8,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/alessio/unixtools/internal/version"
+	"al.essio.dev/pkg/tools/internal/version"
 )
 
 const (

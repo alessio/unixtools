@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/alessio/unixtools/internal/seq"
+	"al.essio.dev/pkg/tools/internal/seq"
 )
 
 func Test_IntSequence(t *testing.T) {

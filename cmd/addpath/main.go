@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 
-	intpath "github.com/alessio/unixtools/internal/path"
+	intpath "al.essio.dev/pkg/tools/internal/path"
 )
 
 var (
