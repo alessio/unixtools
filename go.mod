@@ -1,4 +1,4 @@
-module github.com/alessio/unixtools
+module al.essio.dev/unixtools
 
 go 1.21
 
