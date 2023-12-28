@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 
 	"al.essio.dev/pkg/tools/internal/version"
 )
@@ -44,41 +45,39 @@ func main() {
 
 	handleHelpAndVersionModes()
 
-	if len(flag.Args()) > 0 {
+	if flag.NArg() > 1 {
+		log.Fatalf("unexpected number of arguments: want 0 or 1, got %d", flag.NArg())
+	}
+
+	if flag.NArg() == 1 {
 		logfile, err := openLogFile(flag.Arg(0))
 		if err != nil {
 			log.Fatalf("couldn't open the file %s: %v", flag.Arg(0), err)
 		}
 
+		defer logfile.Close()
 		log.SetOutput(logfile)
+
 	}
 
-	if err := runPortCommand("-N", "-v", "selfupdate"); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := runPortCommand("-N", "outdated"); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := runPortCommand("-N", "-v", "-R", "-u", "-c", "upgrade", "outdated"); err != nil {
-		log.Fatal(err)
-	}
+	runPortFailOnError("-N", "-v", "selfupdate")
+	runPortFailOnError("-N", "outdated")
+	runPortFailOnError("-N", "-v", "-R", "-u", "-c", "upgrade", "outdated")
 
 	if runReclaim {
-		if err := runPortCommand("-N", "-v", "reclaim"); err != nil {
-			log.Fatal(err)
-		}
+		runPortFailOnError("-N", "-v", "reclaim")
 	}
 }
 
-func runPortCommand(args ...string) error {
-	log.Println("Will run", PortExe, args)
+func runPortFailOnError(args ...string) {
+	log.Printf("RUN: %s %s\n", PortExe, strings.Join(args, " "))
 	cmd := exec.Command(PortExe, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	return cmd.Run()
+	if err := cmd.Run(); err != nil {
+		log.Fatalf("command exited with error: %v", err)
+	}
 }
 
 func openLogFile(filename string) (io.WriteCloser, error) {
