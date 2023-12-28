@@ -1,5 +1,5 @@
 ![Build](https://github.com/alessio/unixtools/workflows/Build/badge.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/alessio/unixtools)](https://goreportcard.com/report/github.com/alessio/unixtools)
+[![Go Report Card](https://goreportcard.com/badge/al.essio.dev/pkg/tools)](https://goreportcard.com/report/github.com/alessio/unixtools)
 [![license](https://img.shields.io/github/license/alessio/unixtools.svg)](https://github.com/alessio/unixtools/blob/master/LICENSE)
 [![LoC](https://tokei.rs/b1/github/alessio/unixtools)](https://github.com/alessio/unixtools)
 [![codecov](https://codecov.io/github/alessio/unixtools/graph/badge.svg?token=XG71JUFEFN)](https://codecov.io/github/alessio/unixtools)
@@ -13,7 +13,7 @@ alessio's UNIX Convenience Tools.
 Just run:
 
 ```
-$ go get github.com/alessio/unixtools/cmd/...
+$ go get al.essio.dev/pkg/tools/cmd/...
 ```
 
 # What's in This Repo?
