@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"al.essio.dev/pkg/tools/internal/path"
 	"al.essio.dev/pkg/tools/internal/version"
+	"al.essio.dev/pkg/tools/pathlist"
 )
 
 const (
@@ -28,7 +28,7 @@ var (
 	envVar string
 )
 
-var cmdHandlers map[string]func(d path.List)
+var cmdHandlers map[string]func(d pathlist.List)
 
 func init() {
 	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
@@ -39,13 +39,13 @@ func init() {
 	flag.Usage = usage
 	flag.CommandLine.SetOutput(os.Stderr)
 
-	cmdHandlers = func() map[string]func(path.List) {
-		hList := func(d path.List) { list(d) }
-		hAppend := func(d path.List) { d.Append(flag.Arg(1)) }
-		hDrop := func(d path.List) { d.Drop(flag.Arg(1)) }
-		hPrepend := func(d path.List) { d.Prepend(flag.Arg(1)) }
+	cmdHandlers = func() map[string]func(pathlist.List) {
+		hList := func(d pathlist.List) { list(d) }
+		hAppend := func(d pathlist.List) { d.Append(flag.Arg(1)) }
+		hDrop := func(d pathlist.List) { d.Drop(flag.Arg(1)) }
+		hPrepend := func(d pathlist.List) { d.Prepend(flag.Arg(1)) }
 
-		return map[string]func(path.List){
+		return map[string]func(pathlist.List){
 			"list":    hList,
 			"append":  hAppend,
 			"drop":    hDrop,
@@ -70,7 +70,7 @@ func main() {
 
 	handleHelpAndVersionModes()
 
-	dirs := path.NewList()
+	dirs := pathlist.New()
 	dirs.LoadEnv(envVar)
 	//fmt.Println(Paths.Slice())
 
@@ -87,7 +87,7 @@ func main() {
 	}
 }
 
-func printPathList(d path.List) {
+func printPathList(d pathlist.List) {
 	//if len(Paths.Slice()) == 0 {
 	//	fmt.Println()
 	//	os.Exit(0)
@@ -112,7 +112,7 @@ func printPathList(d path.List) {
 	fmt.Println(sb.String())
 }
 
-func list(d path.List) {
+func list(d pathlist.List) {
 	printPathList(d)
 }
 
@@ -155,11 +155,11 @@ environment variable; the default output format is one path per
 line.`)
 }
 
-func exePath() string {
-	exePath, err := os.Executable()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return filepath.Dir(exePath)
-}
+//func exePath() string {
+//	exePath, err := os.Executable()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	return filepath.Dir(exePath)
+//}

@@ -1,6 +1,6 @@
-// Package dirlist implements functions to manipoulate PATH-like
+// Package pathlist implements functions to manipoulate PATH-like
 // environment variables.
-package path
+package pathlist
 
 import (
 	"os"
@@ -57,7 +57,7 @@ func (d *dirList) init() {
 	d.lst = []string{}
 }
 
-func NewList() List {
+func New() List {
 	d := new(dirList)
 	d.init()
 	return d
