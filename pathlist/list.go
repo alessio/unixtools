@@ -1,6 +1,6 @@
-// Package dirlist implements functions to manipoulate PATH-like
+// Package pathlist implements functions to manipoulate PATH-like
 // environment variables.
-package path
+package pathlist
 
 import (
 	"os"
@@ -52,12 +52,8 @@ type dirList struct {
 	src string
 }
 
-func (d *dirList) init() {
-	d.src = ""
-	d.lst = []string{}
-}
-
-func NewList() List {
+// New creates a new path list.
+func New() List {
 	d := new(dirList)
 	d.init()
 	return d
@@ -143,6 +139,11 @@ func (d *dirList) Prepend(path string) {
 	if !d.Contains(p) {
 		d.lst = slices.Insert(d.lst, 0, p)
 	}
+}
+
+func (d *dirList) init() {
+	d.src = ""
+	d.lst = []string{}
 }
 
 func (d *dirList) cleanPathVar() []string {

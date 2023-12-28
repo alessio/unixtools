@@ -1,4 +1,4 @@
-package path
+package pathlist
 
 import (
 	"testing"
@@ -24,7 +24,7 @@ func Test_newDirList(t *testing.T) {
 }
 
 func Test_DirList_Append(t *testing.T) {
-	d := NewList()
+	d := New()
 	require.True(t, d.Nil())
 	for _, p := range []string{"/var", "/var", "/bin", "/bin/", "/bin///"} {
 		d.Append(p)
@@ -39,13 +39,7 @@ func Test_DirList_Append(t *testing.T) {
 }
 
 func Test_DirList_Prepend(t *testing.T) {
-	type tc struct {
-		fn   func(string) bool
-		dir  string
-		want bool
-	}
-
-	d := NewList()
+	d := New()
 	dirs := []string{
 		"/var", "/var", "/bin", "/bin/",
 	}
@@ -67,7 +61,7 @@ func Test_DirList_Prepend(t *testing.T) {
 }
 
 func Test_DirList_Drop(t *testing.T) {
-	d := NewList()
+	d := New()
 	d.Load("/opt/local/bin:/usr/local/bin:/sbin:/bin:/var")
 	d.Drop("/opt/local/bin")
 	d.Drop("/opt/local/bin")
