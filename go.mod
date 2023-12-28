@@ -2,10 +2,7 @@ module al.essio.dev/pkg/tools
 
 go 1.21
 
-require (
-	github.com/alessio/shellescape v1.4.2
-	github.com/stretchr/testify v1.8.4
-)
+require github.com/stretchr/testify v1.8.4
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
