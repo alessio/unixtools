@@ -20,6 +20,7 @@ var (
 	versionMode  bool
 	listMode     bool
 	noprefixMode bool
+	dropMode     bool
 )
 
 var (
@@ -31,42 +32,39 @@ var cmdHandlers map[string]func(d pathlist.List)
 func init() {
 	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
 	flag.BoolVar(&versionMode, "version", false, "output version information and exit.")
+	flag.BoolVar(&dropMode, "D", false, "drop the path before adding it again to the list.")
 	flag.BoolVar(&noprefixMode, "noprefix", false, "output the variable contents only.")
 	flag.BoolVar(&listMode, "L", false, "use a newline character as path list separator.")
-	flag.StringVar(&envVar, "E", "PATH", "input environment variable")
+	flag.StringVar(&envVar, "E", "PATH", "input environment variable.")
 	flag.Usage = usage
 	flag.CommandLine.SetOutput(os.Stderr)
 
 	cmdHandlers = func() map[string]func(pathlist.List) {
-		hAppend := func(d pathlist.List) { d.Append(flag.Arg(1)) }
-		hMoveAppend := func(d pathlist.List) {
-			d.Drop(flag.Arg(1))
+		hAppend := func(d pathlist.List) {
+			if dropMode {
+				d.Drop(flag.Arg(1))
+			}
 			d.Append(flag.Arg(1))
 		}
 		hDrop := func(d pathlist.List) { d.Drop(flag.Arg(1)) }
-		hMovePrepend := func(d pathlist.List) {
-			d.Drop(flag.Arg(1))
-			d.Prepend(flag.Arg(1))
-		}
 		hPrepend := func(d pathlist.List) {
+			if dropMode {
+				d.Drop(flag.Arg(1))
+			}
 			d.Prepend(flag.Arg(1))
 		}
 
 		return map[string]func(pathlist.List){
-			"append":       hAppend,
-			"drop":         hDrop,
-			"prepend":      hPrepend,
-			"move-append":  hMoveAppend,
-			"move-prepend": hMovePrepend,
+			"append":  hAppend,
+			"drop":    hDrop,
+			"prepend": hPrepend,
 			//"appendPathctlDir":  func() { appendPath(exePath()) },
 			//"prependPathctlDir": func() { prependPath(exePath()) },
 
 			// aliases
-			"a":  hAppend,
-			"d":  hDrop,
-			"p":  hPrepend,
-			"mv": hMoveAppend,
-			"mp": hMovePrepend,
+			"a": hAppend,
+			"d": hDrop,
+			"p": hPrepend,
 		}
 	}()
 }
@@ -115,10 +113,6 @@ func printPathList(d pathlist.List) {
 	fmt.Println(sb.String())
 }
 
-func list(d pathlist.List) {
-	printPathList(d)
-}
-
 func handleHelpAndVersionModes() {
 	if !helpMode && !versionMode {
 		return
@@ -135,21 +129,16 @@ func handleHelpAndVersionModes() {
 }
 
 func usage() {
-	s := fmt.Sprintf(`Usage: %s COMMAND [PATH]
+	s := fmt.Sprintf(`Usage: %s [COMMAND [PATH]]
 Make the management of the PATH environment variable
 simple, fast, and predictable.
 
 Commands:
 
-   append, a           append a path to the end of the list
-   move-append, ma     append a new path to the end of the list;
-                       if the list contains the path already then
-                       it will be moved to the end of the list
-   drop, d             drop a path
-   prepend, p          prepend a path to the list
-   move-prepend, mp    prepend a new path to the top of the list;
-                       if the list contains the path already then
-                       it will be moved to the top of the list
+   append, a           append a path to the end of the list.
+   drop, d             drop a path.
+   prepend, p          prepend a path to the list.
+
 Options:
 `, programme)
 	_, _ = fmt.Fprintln(os.Stderr, s)
@@ -157,6 +146,11 @@ Options:
 	flag.PrintDefaults()
 
 	_, _ = fmt.Fprintln(os.Stderr, `
+When used with -D flag on, the commands append and prepend
+would drop the path first so that it is guaranteed that it
+would be added as either the first or the last element of
+the path list.
+
 If COMMAND is not provided, it prints the contents of the PATH
 environment variable.`)
 }
