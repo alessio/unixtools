@@ -144,10 +144,10 @@ Options:
 	flag.PrintDefaults()
 
 	_, _ = fmt.Fprintln(os.Stderr, `
-When used with -D flag on, the commands append and prepend
-would drop the path first so that it is guaranteed that it
-would be added as either the first or the last element of
-the path list.
+When used with the -D flag, the commands append and prepend
+drop PATH before adding it again to the list. This behaviour
+guarantees that PATH is added as either the first or the last
+element of the path list.
 
 If COMMAND is not provided, it prints the contents of the PATH
 environment variable.`)
