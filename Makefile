@@ -66,7 +66,7 @@ clean:
 	   version.txt
 
 version.txt: deps
-	cp -f version/version.txt version.txt
+	cp -f ./internal/version/version.txt version.txt
 
 list:
 	@echo $(BINS) | tr ' ' '\n'
