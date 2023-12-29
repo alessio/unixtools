@@ -28,7 +28,7 @@ jobs:
           for os in linux darwin openbsd ; do
             for arch in amd64 arm64 ; do
               GOARCH=${arch} GOOS=${os} make build
-              mv build unixtools-$os-$arch
+              mv -v build unixtools-$os-$arch
             done
           done
 
