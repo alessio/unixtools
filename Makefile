@@ -49,12 +49,6 @@ check: $(COVERAGE_REPORT_FILENAME)
 $(COVERAGE_REPORT_FILENAME): version.txt
 	go test $(VERBOSE) -mod=readonly -race -cover -covermode=atomic -coverprofile=$@ ./...
 
-deps:
-	echo "Ensure dependencies have not been modified ..." >&2
-	go mod verify
-	go mod tidy
-	go generate ./...
-
 distclean: clean
 	rm -rf dist/
 	rm -rf unixtools.dmg
@@ -65,7 +59,11 @@ clean:
 	   $(COVERAGE_REPORT_FILENAME) \
 	   version.txt
 
-version.txt: deps
+version.txt:
+	echo "Ensure dependencies have not been modified ..." >&2
+	go mod verify
+	go mod tidy
+	go generate ./...
 	cp -f ./internal/version/version.txt version.txt
 
 list:
@@ -87,4 +85,4 @@ unixtools.dmg: version.txt macos-codesign
 		--sandbox-safe --no-internet-enable \
 		$@ dist/unixtools-$${VERSION}
 
-.PHONY: all clean check distclean build list macos-codesign deps
+.PHONY: all clean check distclean build list macos-codesign
