@@ -31,11 +31,11 @@ ifdef verbose
 VERBOSE = -v
 endif
 
-all: generate build check
+all: version.txt build check
 
 BUILD_TARGETS := build install
 
-build: generate
+build: version.txt
 build: BUILD_ARGS=-o $(BUILDDIR)/
 
 $(BUILD_TARGETS): $(BUILDDIR)/
@@ -55,10 +55,8 @@ go.sum: go.mod
 	go mod tidy
 	touch $@
 
-generate: generate-stamp
-generate-stamp: go.sum
+generate:
 	go generate ./...
-	touch $@
 
 distclean: clean
 	rm -rf dist/
@@ -68,10 +66,10 @@ clean:
 	rm -rf $(BUILDDIR)
 	rm -f \
 	   $(COVERAGE_REPORT_FILENAME) \
-	   generate-stamp version-stamp
+	   version.txt
 
-version-stamp: generate
-	cp internal/version/version.txt $@
+version.txt: generate
+	cp -f version/version.txt version.txt
 
 list:
 	@echo $(BINS) | tr ' ' '\n'
