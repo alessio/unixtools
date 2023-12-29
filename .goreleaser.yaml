@@ -2,7 +2,6 @@ project_name: unixtools
 before:
   hooks:
     - go generate ./...
-    - cat ./version/version.txt
 
 gomod:
   proxy: true
