@@ -8,7 +8,7 @@ import (
 )
 
 //go:generate sh generate_version.sh
-//go:embed *version.txt
+//go:embed version.txt
 var version string
 
 func Short() string {

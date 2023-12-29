@@ -1,7 +1,6 @@
 package main
 
 import (
-	"al.essio.dev/pkg/tools/version"
 	"flag"
 	"fmt"
 	"log"
@@ -10,6 +9,7 @@ import (
 	"strings"
 
 	"al.essio.dev/pkg/tools/internal/seq"
+	"al.essio.dev/pkg/tools/internal/version"
 )
 
 var (

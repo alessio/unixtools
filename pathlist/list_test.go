@@ -34,8 +34,8 @@ func Test_DirList_Append(t *testing.T) {
 	d.Prepend("/bin///")
 	require.Equal(t, "/var:/bin", d.String())
 
-	//require.Equal(t, 2, d.Append("/var"), ("/usr/local/bin", "/opt/local/bin"))
-	//require.Equal(t, "/var:/bin:/usr/local/bin:/opt/local/bin", d.String())
+	// require.Equal(t, 2, d.Append("/var"), ("/usr/local/bin", "/opt/local/bin"))
+	// require.Equal(t, "/var:/bin:/usr/local/bin:/opt/local/bin", d.String())
 }
 
 func Test_DirList_Prepend(t *testing.T) {

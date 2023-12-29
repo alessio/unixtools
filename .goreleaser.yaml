@@ -1,8 +1,8 @@
 project_name: unixtools
 before:
   hooks:
-  - go generate ./...
-  - cat ./version/version.txt
+    - go generate ./...
+    - cat ./version/version.txt
 
 gomod:
   proxy: true
@@ -106,8 +106,8 @@ archives:
   - format: tar.gz
     wrap_in_directory: true
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
 checksum:
   name_template: 'checksums.txt'
 snapshot:
