@@ -17,7 +17,7 @@ builds:
   - main: ./cmd/elvoke
     id: "elvoke"
     hooks:
-      pre: make clean && go generate ./...
+      pre: go generate ./...
     binary: elvoke
     env:
       - CGO_ENABLED=0
@@ -29,7 +29,7 @@ builds:
 
   - main: ./cmd/mcd
     hooks:
-      pre: make clean && go generate ./...
+      pre: go generate ./...
     id: "mcd"
     binary: mcd
     env:
@@ -42,7 +42,7 @@ builds:
 
   - main: ./cmd/pathctl
     hooks:
-      pre: make clean && go generate ./...
+      pre: go generate ./...
     id: "pathctl"
     binary: pathctl
     env:
@@ -55,7 +55,7 @@ builds:
 
   - main: ./cmd/popbak
     hooks:
-      pre: make clean && go generate ./...
+      pre: go generate ./...
     id: "popbak"
     binary: popbak
     env:
@@ -68,7 +68,7 @@ builds:
 
   - main: ./cmd/portup
     hooks:
-      pre: make clean && go generate ./...
+      pre: go generate ./...
     id: "portup"
     binary: portup
     env:
@@ -81,7 +81,7 @@ builds:
 
   - main: ./cmd/pushbak
     hooks:
-      pre: make clean && go generate ./...
+      pre: go generate ./...
     id: "pushbak"
     binary: pushbak
     env:
@@ -94,7 +94,7 @@ builds:
 
   - main: ./cmd/refiles
     hooks:
-      pre: make clean && go generate ./...
+      pre: go generate ./...
     id: "refiles"
     binary: refiles
     env:
@@ -107,7 +107,7 @@ builds:
 
   - main: ./cmd/seq
     hooks:
-      pre: make clean && go generate ./...
+      pre: go generate ./...
     id: "seq"
     binary: seq
     env:
