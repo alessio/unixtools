@@ -25,18 +25,12 @@ jobs:
         with:
           go-version: '1.21'
       - run: |
-          GOOS=linux GOARCH=amd64 make clean build
-          mv build unixtools-$GOOS-$GOARCH
-          GOOS=linux GOARCH=arm64 make clean build
-          mv build unixtools-$GOOS-$GOARCH
-          GOOS=darwin GOARCH=amd64 make clean build
-          mv build unixtools-$GOOS-$GOARCH
-          GOOS=darwin GOARCH=arm64 make clean build
-          mv build unixtools-$GOOS-$GOARCH
-          GOOS=openbsd GOARCH=amd64 make clean build
-          mv build unixtools-$GOOS-$GOARCH
-          GOOS=openbsd GOARCH=arm64 make clean build
-          mv build unixtools-$GOOS-$GOARCH
+          for os in linux darwin openbsd ; do
+            for arch in amd64 arm64 ; do
+              GOARCH=${arch} GOOS=${os} make clean build
+              mv build unixtools-$os-$arch
+            done
+          done
 
 #      - uses: goreleaser/goreleaser-action@v4
 #        with:
