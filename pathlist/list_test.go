@@ -62,7 +62,8 @@ func Test_DirList_Prepend(t *testing.T) {
 
 func Test_DirList_Drop(t *testing.T) {
 	d := New()
-	d.Load("/opt/local/bin:/usr/local/bin:/sbin:/bin:/var")
+	d.Load("/opt/local/bin:/usr/local/bin:/sbin:/bin:/var:/bin")
+	require.Equal(t, d.Slice(), []string{"/opt/local/bin", "/usr/local/bin", "/sbin", "/bin", "/var"})
 	d.Drop("/opt/local/bin")
 	d.Drop("/opt/local/bin")
 	d.Drop("/opt/local/bin")

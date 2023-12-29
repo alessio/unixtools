@@ -42,8 +42,8 @@ type List interface {
 	// Slice returns the path list as a slice of strings.
 	Slice() []string
 
-	// Returns the path list as a string of path list separator-separated
-	// directories.
+	// String returns the path list as a string of path list
+	// separator-separated directories.
 	String() string
 }
 
@@ -168,18 +168,18 @@ func (d *dirList) clone(o *dirList) *dirList {
 }
 
 func removeDups[T comparable](col []T, applyFn func(T) (T, bool)) []T {
-	uniq := []T{}
+	var uniq = make([]T, 0)
 	ks := make(map[T]interface{})
 
 	for _, el := range col {
-		newval, ok := applyFn(el)
+		vv, ok := applyFn(el)
 		if !ok {
 			continue
 		}
 
-		if _, ok := ks[newval]; !ok {
-			uniq = append(uniq, newval)
-			ks[newval] = struct{}{}
+		if _, ok := ks[vv]; !ok {
+			uniq = append(uniq, vv)
+			ks[vv] = struct{}{}
 		}
 	}
 
