@@ -46,17 +46,14 @@ $(BUILDDIR)/:
 
 check: $(COVERAGE_REPORT_FILENAME)
 
-$(COVERAGE_REPORT_FILENAME): generate
+$(COVERAGE_REPORT_FILENAME): version.txt
 	go test $(VERBOSE) -mod=readonly -race -cover -covermode=atomic -coverprofile=$@ ./...
 
-go.sum: go.mod
+deps:
 	echo "Ensure dependencies have not been modified ..." >&2
 	go mod verify
-	go mod tidy
-	touch $@
-
-generate:
 	go generate ./...
+	go mod tidy
 
 distclean: clean
 	rm -rf dist/
@@ -68,7 +65,7 @@ clean:
 	   $(COVERAGE_REPORT_FILENAME) \
 	   version.txt
 
-version.txt: generate
+version.txt: deps
 	cp -f version/version.txt version.txt
 
 list:
@@ -77,12 +74,12 @@ list:
 macos-codesign: build
 	codesign --verbose -s $(CODESIGN_IDENTITY) --options=runtime $(BUILDDIR)/*
 
-unixtools.pkg: version-stamp macos-codesign
+unixtools.pkg: version.txt macos-codesign
 	pkgbuild --identifier io.asscrypto.unixtools \
 		--install-location ./Library/ --root $(BUILDDIR) $@
 
-unixtools.dmg: version-stamp macos-codesign
-	VERSION=$(shell cat version-stamp); \
+unixtools.dmg: version.txt macos-codesign
+	VERSION=$(shell cat version.txt); \
 	mkdir -p dist/unixtools-$${VERSION}/bin ; \
 	cp -a $(BUILDDIR)/* dist/unixtools-$${VERSION}/bin/ ; \
 	chmod 0755 dist/unixtools-$${VERSION}/bin/* ; \
@@ -90,4 +87,4 @@ unixtools.dmg: version-stamp macos-codesign
 		--sandbox-safe --no-internet-enable \
 		$@ dist/unixtools-$${VERSION}
 
-.PHONY: all clean check distclean build list macos-codesign generate
+.PHONY: all clean check distclean build list macos-codesign deps
