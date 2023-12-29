@@ -15,6 +15,9 @@ gomod:
 
 builds:
   - main: ./cmd/elvoke
+    goarch:
+      - amd64
+      - arm64
     id: "elvoke"
     binary: elvoke
     env:
@@ -26,6 +29,9 @@ builds:
       - freebsd
 
   - main: ./cmd/mcd
+    goarch:
+      - amd64
+      - arm64
     id: "mcd"
     binary: mcd
     env:
@@ -37,6 +43,9 @@ builds:
       - freebsd
 
   - main: ./cmd/pathctl
+    goarch:
+      - amd64
+      - arm64
     id: "pathctl"
     binary: pathctl
     env:
@@ -48,6 +57,9 @@ builds:
       - freebsd
 
   - main: ./cmd/popbak
+    goarch:
+      - amd64
+      - arm64
     id: "popbak"
     binary: popbak
     env:
@@ -59,14 +71,23 @@ builds:
       - freebsd
 
   - main: ./cmd/portup
+    goarch:
+      - amd64
+      - arm64
     id: "portup"
     binary: portup
     env:
       - CGO_ENABLED=0
     goos:
+      - linux
       - darwin
+      - openbsd
+      - freebsd
 
   - main: ./cmd/pushbak
+    goarch:
+      - amd64
+      - arm64
     id: "pushbak"
     binary: pushbak
     env:
@@ -78,6 +99,9 @@ builds:
       - freebsd
 
   - main: ./cmd/refiles
+    goarch:
+      - amd64
+      - arm64
     id: "refiles"
     binary: refiles
     env:
@@ -89,6 +113,9 @@ builds:
       - freebsd
 
   - main: ./cmd/seq
+    goarch:
+      - amd64
+      - arm64
     id: "seq"
     binary: seq
     env:
