@@ -1,4 +1,4 @@
-// Package pathlist implements functions to manipoulate PATH-like
+// Package pathlist implements functions to manipulate PATH-like
 // environment variables.
 package pathlist
 
