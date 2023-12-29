@@ -3,7 +3,6 @@ before:
   hooks:
   - make distclean
   - go mod verify
-  - go mod tidy
   - go generate ./...
 
 gomod:
