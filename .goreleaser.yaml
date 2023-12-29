@@ -27,96 +27,110 @@ builds:
     goarm:
       - 7
 
-#  - main: ./cmd/mcd
-#    id: "mcd"
-#    binary: mcd
-#    hooks:
-#      pre: go generate ./...
-#    env:
-#      - CGO_ENABLED=0
-#    goos:
-#      - linux
-#      - darwin
-#      - openbsd
-#      - freebsd
-#
-#  - main: ./cmd/pathctl
-#    hooks:
-#      pre: go generate ./...
-#    id: "pathctl"
-#    binary: pathctl
-#    env:
-#      - CGO_ENABLED=0
-#    goos:
-#      - linux
-#      - darwin
-#      - openbsd
-#      - freebsd
-#
-#  - main: ./cmd/popbak
-#    id: "popbak"
-#    binary: popbak
-#    hooks:
-#      pre: go generate ./...
-#    env:
-#      - CGO_ENABLED=0
-#    goos:
-#      - linux
-#      - darwin
-#      - openbsd
-#      - freebsd
-#
-#  - main: ./cmd/portup
-#    id: "portup"
-#    binary: portup
-#    hooks:
-#      pre: go generate ./...
-#    env:
-#      - CGO_ENABLED=0
-#    goos:
-#      - linux
-#      - darwin
-#      - openbsd
-#      - freebsd
-#
-#  - main: ./cmd/pushbak
-#    id: "pushbak"
-#    binary: pushbak
-#    hooks:
-#      pre: go generate ./...
-#    env:
-#      - CGO_ENABLED=0
-#    goos:
-#      - linux
-#      - darwin
-#      - openbsd
-#      - freebsd
-#
-#  - main: ./cmd/refiles
-#    id: "refiles"
-#    binary: refiles
-#    hooks:
-#      pre: go generate ./...
-#    env:
-#      - CGO_ENABLED=0
-#    goos:
-#      - linux
-#      - darwin
-#      - openbsd
-#      - freebsd
-#
-#  - main: ./cmd/seq
-#    id: "seq"
-#    hooks:
-#      pre: go generate ./...
-#    binary: seq
-#    env:
-#      - CGO_ENABLED=0
-#    goos:
-#      - linux
-#      - darwin
-#      - openbsd
-#      - freebsd
+  - id: mcd
+    main: ./cmd/mcd
+    binary: mcd
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 7
+
+  - id: pathctl
+    main: ./cmd/pathctl
+    binary: pathctl
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 7
+
+  - id: popbak
+    main: ./cmd/popbak
+    binary: popbak
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 7
+
+  - id: portup
+    main: ./cmd/portup
+    binary: portup
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 7
+
+  - id: pushbak
+    main: ./cmd/pushbak
+    binary: pushbak
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 7
+
+  - id: refiles
+    main: ./cmd/refiles
+    binary: refiles
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 7
+
+  - id: seq
+    main: ./cmd/seq
+    binary: seq
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 7
 
 archives:
   - format: tar.gz
