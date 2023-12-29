@@ -87,6 +87,7 @@ builds:
     goarm:
       - 7
 
+
   - id: pushbak
     main: ./cmd/pushbak
     binary: pushbak
