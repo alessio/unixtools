@@ -12,7 +12,7 @@ gomod:
   mod: readonly
 
 builds:
-  - id: "elvoke"
+  - id: elvoke
     main: ./cmd/elvoke
     binary: elvoke
     env:
