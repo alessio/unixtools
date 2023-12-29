@@ -52,8 +52,8 @@ $(COVERAGE_REPORT_FILENAME): version.txt
 deps:
 	echo "Ensure dependencies have not been modified ..." >&2
 	go mod verify
-	go generate ./...
 	go mod tidy
+	go generate ./...
 
 distclean: clean
 	rm -rf dist/

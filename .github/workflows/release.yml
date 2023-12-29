@@ -27,7 +27,7 @@ jobs:
       - run: |
           for os in linux darwin openbsd ; do
             for arch in amd64 arm64 ; do
-              GOARCH=${arch} GOOS=${os} make clean build
+              GOARCH=${arch} GOOS=${os} make build
               mv build unixtools-$os-$arch
             done
           done
