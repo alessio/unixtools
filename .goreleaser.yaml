@@ -1,7 +1,6 @@
 project_name: unixtools
 before:
   hooks:
-  - make clean
   - go generate ./...
   - cat ./version/version.txt
   - go mod tidy
