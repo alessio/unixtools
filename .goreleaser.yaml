@@ -15,10 +15,9 @@ gomod:
 
 builds:
   - main: ./cmd/elvoke
-    goarch:
-      - amd64
-      - arm64
     id: "elvoke"
+    hooks:
+      pre: make clean && go generate ./...
     binary: elvoke
     env:
       - CGO_ENABLED=0
@@ -29,9 +28,8 @@ builds:
       - freebsd
 
   - main: ./cmd/mcd
-    goarch:
-      - amd64
-      - arm64
+    hooks:
+      pre: make clean && go generate ./...
     id: "mcd"
     binary: mcd
     env:
@@ -43,9 +41,8 @@ builds:
       - freebsd
 
   - main: ./cmd/pathctl
-    goarch:
-      - amd64
-      - arm64
+    hooks:
+      pre: make clean && go generate ./...
     id: "pathctl"
     binary: pathctl
     env:
@@ -57,9 +54,8 @@ builds:
       - freebsd
 
   - main: ./cmd/popbak
-    goarch:
-      - amd64
-      - arm64
+    hooks:
+      pre: make clean && go generate ./...
     id: "popbak"
     binary: popbak
     env:
@@ -71,9 +67,8 @@ builds:
       - freebsd
 
   - main: ./cmd/portup
-    goarch:
-      - amd64
-      - arm64
+    hooks:
+      pre: make clean && go generate ./...
     id: "portup"
     binary: portup
     env:
@@ -85,9 +80,8 @@ builds:
       - freebsd
 
   - main: ./cmd/pushbak
-    goarch:
-      - amd64
-      - arm64
+    hooks:
+      pre: make clean && go generate ./...
     id: "pushbak"
     binary: pushbak
     env:
@@ -99,9 +93,8 @@ builds:
       - freebsd
 
   - main: ./cmd/refiles
-    goarch:
-      - amd64
-      - arm64
+    hooks:
+      pre: make clean && go generate ./...
     id: "refiles"
     binary: refiles
     env:
@@ -113,9 +106,8 @@ builds:
       - freebsd
 
   - main: ./cmd/seq
-    goarch:
-      - amd64
-      - arm64
+    hooks:
+      pre: make clean && go generate ./...
     id: "seq"
     binary: seq
     env:
