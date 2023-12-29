@@ -1,7 +1,8 @@
 project_name: unixtools
 before:
   hooks:
-    - go generate ./...
+    - go mod tidy
+    - go generate ./internal/...
 
 gomod:
   proxy: true
@@ -11,10 +12,8 @@ gomod:
   mod: readonly
 
 builds:
-  - main: ./cmd/elvoke
-    id: "elvoke"
-    hooks:
-      pre: go generate ./...
+  - id: "elvoke"
+    main: ./cmd/elvoke/main.go
     binary: elvoke
     env:
       - CGO_ENABLED=0
@@ -22,98 +21,102 @@ builds:
       - linux
       - darwin
       - openbsd
-      - freebsd
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 7
 
-  - main: ./cmd/mcd
-    id: "mcd"
-    binary: mcd
-    hooks:
-      pre: go generate ./...
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - main: ./cmd/pathctl
-    hooks:
-      pre: go generate ./...
-    id: "pathctl"
-    binary: pathctl
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - main: ./cmd/popbak
-    id: "popbak"
-    binary: popbak
-    hooks:
-      pre: go generate ./...
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - main: ./cmd/portup
-    id: "portup"
-    binary: portup
-    hooks:
-      pre: go generate ./...
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - main: ./cmd/pushbak
-    id: "pushbak"
-    binary: pushbak
-    hooks:
-      pre: go generate ./...
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - main: ./cmd/refiles
-    id: "refiles"
-    binary: refiles
-    hooks:
-      pre: go generate ./...
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - main: ./cmd/seq
-    id: "seq"
-    hooks:
-      pre: go generate ./...
-    binary: seq
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
+#  - main: ./cmd/mcd
+#    id: "mcd"
+#    binary: mcd
+#    hooks:
+#      pre: go generate ./...
+#    env:
+#      - CGO_ENABLED=0
+#    goos:
+#      - linux
+#      - darwin
+#      - openbsd
+#      - freebsd
+#
+#  - main: ./cmd/pathctl
+#    hooks:
+#      pre: go generate ./...
+#    id: "pathctl"
+#    binary: pathctl
+#    env:
+#      - CGO_ENABLED=0
+#    goos:
+#      - linux
+#      - darwin
+#      - openbsd
+#      - freebsd
+#
+#  - main: ./cmd/popbak
+#    id: "popbak"
+#    binary: popbak
+#    hooks:
+#      pre: go generate ./...
+#    env:
+#      - CGO_ENABLED=0
+#    goos:
+#      - linux
+#      - darwin
+#      - openbsd
+#      - freebsd
+#
+#  - main: ./cmd/portup
+#    id: "portup"
+#    binary: portup
+#    hooks:
+#      pre: go generate ./...
+#    env:
+#      - CGO_ENABLED=0
+#    goos:
+#      - linux
+#      - darwin
+#      - openbsd
+#      - freebsd
+#
+#  - main: ./cmd/pushbak
+#    id: "pushbak"
+#    binary: pushbak
+#    hooks:
+#      pre: go generate ./...
+#    env:
+#      - CGO_ENABLED=0
+#    goos:
+#      - linux
+#      - darwin
+#      - openbsd
+#      - freebsd
+#
+#  - main: ./cmd/refiles
+#    id: "refiles"
+#    binary: refiles
+#    hooks:
+#      pre: go generate ./...
+#    env:
+#      - CGO_ENABLED=0
+#    goos:
+#      - linux
+#      - darwin
+#      - openbsd
+#      - freebsd
+#
+#  - main: ./cmd/seq
+#    id: "seq"
+#    hooks:
+#      pre: go generate ./...
+#    binary: seq
+#    env:
+#      - CGO_ENABLED=0
+#    goos:
+#      - linux
+#      - darwin
+#      - openbsd
+#      - freebsd
 
 archives:
   - format: tar.gz
