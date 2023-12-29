@@ -24,10 +24,24 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: '1.21'
-      - uses: goreleaser/goreleaser-action@v4
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --verbose -f .goreleaser.yaml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GORELEASER_TOKEN }}
+      - run: |
+          GOOS=linux GOARCH=amd64 make clean build
+          mv build unixtools-$GOOS-$GOARCH
+          GOOS=linux GOARCH=arm64 make clean build
+          mv build unixtools-$GOOS-$GOARCH
+          GOOS=darwin GOARCH=amd64 make clean build
+          mv build unixtools-$GOOS-$GOARCH
+          GOOS=darwin GOARCH=arm64 make clean build
+          mv build unixtools-$GOOS-$GOARCH
+          GOOS=openbsd GOARCH=amd64 make clean build
+          mv build unixtools-$GOOS-$GOARCH
+          GOOS=openbsd GOARCH=arm64 make clean build
+          mv build unixtools-$GOOS-$GOARCH
+
+#      - uses: goreleaser/goreleaser-action@v4
+#        with:
+#          distribution: goreleaser
+#          version: latest
+#          args: release --verbose -f .goreleaser.yaml
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GORELEASER_TOKEN }}
