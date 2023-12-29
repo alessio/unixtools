@@ -13,7 +13,7 @@ gomod:
 
 builds:
   - id: "elvoke"
-    main: ./cmd/elvoke/main.go
+    main: ./cmd/elvoke
     binary: elvoke
     env:
       - CGO_ENABLED=0
