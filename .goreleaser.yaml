@@ -1,9 +1,9 @@
 project_name: unixtools
 before:
   hooks:
-  - make distclean
-  - go mod verify
+  - make clean
   - go generate ./...
+  - go mod tidy
 
 gomod:
   proxy: true
