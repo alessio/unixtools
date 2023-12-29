@@ -14,28 +14,6 @@ gomod:
   mod: readonly
 
 builds:
-  - main: ./cmd/addpath
-    id: "addpath"
-    binary: addpath
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - main: ./cmd/delpath
-    id: "delpath"
-    binary: delpath
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
   - main: ./cmd/elvoke
     id: "elvoke"
     binary: elvoke
@@ -58,6 +36,17 @@ builds:
       - openbsd
       - freebsd
 
+  - main: ./cmd/pathctl
+    id: "pathctl"
+    binary: pathctl
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+      - freebsd
+
   - main: ./cmd/popbak
     id: "popbak"
     binary: popbak
@@ -68,6 +57,14 @@ builds:
       - darwin
       - openbsd
       - freebsd
+
+  - main: ./cmd/portup
+    id: "portup"
+    binary: portup
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
 
   - main: ./cmd/pushbak
     id: "pushbak"
