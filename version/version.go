@@ -7,7 +7,7 @@ import (
 	_ "embed"
 )
 
-//go:generate bash generate_version.sh
+//go:generate sh generate_version.sh
 //go:embed version.txt
 var version string
 

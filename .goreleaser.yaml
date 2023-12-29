@@ -3,6 +3,7 @@ before:
   hooks:
   - make clean
   - go generate ./...
+  - cat ./version/version.txt
   - go mod tidy
 
 gomod:
