@@ -58,8 +58,6 @@ func init() {
 			"append":  hAppend,
 			"drop":    hDrop,
 			"prepend": hPrepend,
-			//"appendPathctlDir":  func() { appendPath(exePath()) },
-			//"prependPathctlDir": func() { prependPath(exePath()) },
 
 			// aliases
 			"a": hAppend,
@@ -154,12 +152,3 @@ the path list.
 If COMMAND is not provided, it prints the contents of the PATH
 environment variable.`)
 }
-
-//func exePath() string {
-//	exePath, err := os.Executable()
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//
-//	return filepath.Dir(exePath)
-//}
