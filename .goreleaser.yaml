@@ -13,6 +13,8 @@ gomod:
 builds:
   - main: ./cmd/elvoke
     id: "elvoke"
+    hooks:
+      pre: go generate ./...
     binary: elvoke
     env:
       - CGO_ENABLED=0
@@ -25,6 +27,8 @@ builds:
   - main: ./cmd/mcd
     id: "mcd"
     binary: mcd
+    hooks:
+      pre: go generate ./...
     env:
       - CGO_ENABLED=0
     goos:
@@ -49,6 +53,8 @@ builds:
   - main: ./cmd/popbak
     id: "popbak"
     binary: popbak
+    hooks:
+      pre: go generate ./...
     env:
       - CGO_ENABLED=0
     goos:
@@ -60,6 +66,8 @@ builds:
   - main: ./cmd/portup
     id: "portup"
     binary: portup
+    hooks:
+      pre: go generate ./...
     env:
       - CGO_ENABLED=0
     goos:
@@ -71,6 +79,8 @@ builds:
   - main: ./cmd/pushbak
     id: "pushbak"
     binary: pushbak
+    hooks:
+      pre: go generate ./...
     env:
       - CGO_ENABLED=0
     goos:
@@ -82,6 +92,8 @@ builds:
   - main: ./cmd/refiles
     id: "refiles"
     binary: refiles
+    hooks:
+      pre: go generate ./...
     env:
       - CGO_ENABLED=0
     goos:
@@ -92,6 +104,8 @@ builds:
 
   - main: ./cmd/seq
     id: "seq"
+    hooks:
+      pre: go generate ./...
     binary: seq
     env:
       - CGO_ENABLED=0
