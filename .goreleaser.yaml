@@ -21,11 +21,7 @@ builds:
       - linux
       - darwin
       - openbsd
-    goarch:
-      - amd64
-      - arm64
-    goarm:
-      - 7
+      - freebsd
 
   - id: mcd
     main: ./cmd/mcd
@@ -36,11 +32,7 @@ builds:
       - linux
       - darwin
       - openbsd
-    goarch:
-      - amd64
-      - arm64
-    goarm:
-      - 7
+      - freebsd
 
   - id: pathctl
     main: ./cmd/pathctl
@@ -51,11 +43,7 @@ builds:
       - linux
       - darwin
       - openbsd
-    goarch:
-      - amd64
-      - arm64
-    goarm:
-      - 7
+      - freebsd
 
   - id: popbak
     main: ./cmd/popbak
@@ -66,11 +54,7 @@ builds:
       - linux
       - darwin
       - openbsd
-    goarch:
-      - amd64
-      - arm64
-    goarm:
-      - 7
+      - freebsd
 
   - id: portup
     main: ./cmd/portup
@@ -81,12 +65,7 @@ builds:
       - linux
       - darwin
       - openbsd
-    goarch:
-      - amd64
-      - arm64
-    goarm:
-      - 7
-
+      - freebsd
 
   - id: pushbak
     main: ./cmd/pushbak
@@ -97,11 +76,7 @@ builds:
       - linux
       - darwin
       - openbsd
-    goarch:
-      - amd64
-      - arm64
-    goarm:
-      - 7
+      - freebsd
 
   - id: refiles
     main: ./cmd/refiles
@@ -112,11 +87,7 @@ builds:
       - linux
       - darwin
       - openbsd
-    goarch:
-      - amd64
-      - arm64
-    goarm:
-      - 7
+      - freebsd
 
   - id: seq
     main: ./cmd/seq
@@ -127,11 +98,7 @@ builds:
       - linux
       - darwin
       - openbsd
-    goarch:
-      - amd64
-      - arm64
-    goarm:
-      - 7
+      - freebsd
 
 archives:
   - format: tar.gz
