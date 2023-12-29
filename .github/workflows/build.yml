@@ -19,7 +19,6 @@ jobs:
       with:
         go-version: '1.21'
     - run: go version
-    - run: make clean
     - run: make
     - run: ./build/pathctl -version
     - uses: codecov/codecov-action@v3
