@@ -28,6 +28,6 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean --snapshot
+          args: release --verbose -f .goreleaser.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GORELEASER_TOKEN }}
