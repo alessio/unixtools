@@ -21,6 +21,7 @@ jobs:
     - run: go version
     - run: make build
     - run: go test -race -cover -covermode=atomic -coverprofile=coverage.out ./...
+    - run: ./build/pathctl -version
     - uses: codecov/codecov-action@v3
       with:
         file: ./coverage.out
