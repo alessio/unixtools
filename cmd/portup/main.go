@@ -1,7 +1,6 @@
 package main
 
 import (
-	"al.essio.dev/pkg/tools/version"
 	"flag"
 	"fmt"
 	"io"
@@ -9,6 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"al.essio.dev/pkg/tools/internal/version"
 )
 
 const (

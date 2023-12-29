@@ -1,10 +1,7 @@
 project_name: unixtools
 before:
   hooks:
-  - make clean
-  - go generate ./...
-  - cat ./version/version.txt
-  - go mod tidy
+    - go generate ./...
 
 gomod:
   proxy: true
@@ -28,10 +25,10 @@ builds:
       - freebsd
 
   - main: ./cmd/mcd
-    hooks:
-      pre: go generate ./...
     id: "mcd"
     binary: mcd
+    hooks:
+      pre: go generate ./...
     env:
       - CGO_ENABLED=0
     goos:
@@ -54,10 +51,10 @@ builds:
       - freebsd
 
   - main: ./cmd/popbak
-    hooks:
-      pre: go generate ./...
     id: "popbak"
     binary: popbak
+    hooks:
+      pre: go generate ./...
     env:
       - CGO_ENABLED=0
     goos:
@@ -67,10 +64,10 @@ builds:
       - freebsd
 
   - main: ./cmd/portup
-    hooks:
-      pre: go generate ./...
     id: "portup"
     binary: portup
+    hooks:
+      pre: go generate ./...
     env:
       - CGO_ENABLED=0
     goos:
@@ -80,10 +77,10 @@ builds:
       - freebsd
 
   - main: ./cmd/pushbak
-    hooks:
-      pre: go generate ./...
     id: "pushbak"
     binary: pushbak
+    hooks:
+      pre: go generate ./...
     env:
       - CGO_ENABLED=0
     goos:
@@ -93,10 +90,10 @@ builds:
       - freebsd
 
   - main: ./cmd/refiles
-    hooks:
-      pre: go generate ./...
     id: "refiles"
     binary: refiles
+    hooks:
+      pre: go generate ./...
     env:
       - CGO_ENABLED=0
     goos:
@@ -106,9 +103,9 @@ builds:
       - freebsd
 
   - main: ./cmd/seq
+    id: "seq"
     hooks:
       pre: go generate ./...
-    id: "seq"
     binary: seq
     env:
       - CGO_ENABLED=0
@@ -122,8 +119,8 @@ archives:
   - format: tar.gz
     wrap_in_directory: true
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
 checksum:
   name_template: 'checksums.txt'
 snapshot:

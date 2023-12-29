@@ -1,7 +1,6 @@
 package main
 
 import (
-	"al.essio.dev/pkg/tools/version"
 	"crypto/sha256"
 	"flag"
 	"fmt"
@@ -12,6 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"al.essio.dev/pkg/tools/internal/version"
 )
 
 var (

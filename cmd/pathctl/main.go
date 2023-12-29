@@ -1,13 +1,13 @@
 package main
 
 import (
-	"al.essio.dev/pkg/tools/version"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
+	"al.essio.dev/pkg/tools/internal/version"
 	"al.essio.dev/pkg/tools/pathlist"
 )
 
