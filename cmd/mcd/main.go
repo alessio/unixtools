@@ -5,62 +5,79 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"al.essio.dev/pkg/tools/internal/version"
 )
 
+const shortUsage = "usage: mcd DIR"
+
 var (
 	helpMode    bool
 	versionMode bool
+	errLog      *log.Logger
 )
 
 func init() {
-	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
-	flag.BoolVar(&versionMode, "version", false, "output version information and exit.")
+	errLog = log.New(os.Stderr, "mcd: ", 0)
+	errLog.SetFlags(0)
+	errLog.SetOutput(os.Stderr)
 
-	flag.Usage = usage
+	flag.Usage = func() { fmt.Fprintln(os.Stderr, shortUsage) }
 	flag.ErrHelp = nil
+	flag.CommandLine.SetOutput(errLog.Writer())
+
+	flag.BoolVar(&helpMode, "help", false, "display this help and exit")
+	flag.BoolVar(&versionMode, "version", false, "output version information and exit")
 }
 
 func main() {
-	log.SetFlags(0)
-	log.SetPrefix("mcd: ")
-	log.SetOutput(os.Stderr)
 	flag.Parse()
-
 	handleHelpAndVersionModes()
 
+	if flag.NArg() != 1 {
+		errLog.Fatalf("invalid arguments -- '%s'\n%s\n", strings.Join(flag.Args(), " "), shortUsage)
+	}
+
 	if _, err := os.Getwd(); err != nil {
-		log.Fatal(err)
+		errLog.Fatal(err)
 	}
 
-	if flag.Parse(); flag.NArg() != 1 {
-		log.Fatal("invalid arguments")
+	var newDir = flag.Arg(0)
+
+	if err := os.MkdirAll(newDir, os.ModePerm); err != nil {
+		fmt.Println(":")
+		errLog.Fatal(err)
 	}
 
-	if err := os.MkdirAll(flag.Arg(0), os.ModePerm); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := os.Chdir(flag.Arg(0)); err != nil {
-		log.Fatal(err)
-	}
+	fmt.Println("cd", newDir)
 }
 
 func handleHelpAndVersionModes() {
 	switch {
 	case helpMode:
 		usage()
+		os.Exit(0)
 	case versionMode:
 		version.PrintWithCopyright()
+		os.Exit(0)
 	}
-
-	os.Exit(0)
 }
 
 func usage() {
 	usageString := `Usage: mcd DIR
-Change the current directory to DIR. Also, create intermediate directories as required.
+Create DIR and all intermediate directories as required.
+Also, it prints 'cd DIR' to STDOUT in case of success else
+':' so that it can be passed as an argument to the shell
+builtin 'eval'.
+
+Examples:
+
+  $ mcd ~/a/b/newdir
+  cd /home/user/a/b/c
+  $ mcd /root/a/b/newdir
+  :
+  mcd: mkdir /root/a/b/newdir: permission denied
 
 Options:`
 	_, _ = fmt.Fprintln(os.Stderr, usageString)
