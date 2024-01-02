@@ -91,9 +91,9 @@ func openLogFile(filename string) (io.WriteCloser, error) {
 
 func usage() {
 	_, _ = fmt.Fprintf(os.Stderr, `Usage: %s [PATH]
-This command is a simple and convenient shortcut
-to update the ports tree and upgrade the packages
-installed with MacPorts.
+This command is a simple and convenient shorcut
+to update and upgrade the packages installed
+with MacPorts.
 
 Options:
 `, programName)
