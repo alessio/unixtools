@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"github.com/alessio/shellescape"
 )
 
 // List builds a list of directories by parsing PATH-like variables
@@ -107,7 +109,7 @@ func (d *dirList) load() {
 }
 
 func (d *dirList) Append(path string) {
-	p := filepath.Clean(path)
+	p := quoteAndClean(path)
 	if d.Nil() {
 		d.lst = []string{p}
 		return
@@ -122,7 +124,7 @@ func (d *dirList) Drop(path string) {
 	if d.Nil() {
 		return
 	}
-	p := filepath.Clean(path)
+	p := quoteAndClean(path)
 
 	if idx := slices.Index(d.lst, p); idx != -1 {
 		d.lst = slices.Delete(d.lst, idx, idx+1)
@@ -130,7 +132,7 @@ func (d *dirList) Drop(path string) {
 }
 
 func (d *dirList) Prepend(path string) {
-	p := filepath.Clean(path)
+	p := quoteAndClean(path)
 	if d.Nil() {
 		d.lst = []string{p}
 		return
@@ -167,9 +169,9 @@ func (d *dirList) clone(o *dirList) *dirList {
 	return o
 }
 
-func removeDups[T comparable](col []T, applyFn func(T) (T, bool)) []T {
-	var uniq = make([]T, 0)
-	ks := make(map[T]interface{})
+func removeDups(col []string, applyFn func(string) (string, bool)) []string {
+	var uniq = make([]string, 0)
+	ks := make(map[string]interface{})
 
 	for _, el := range col {
 		vv, ok := applyFn(el)
@@ -178,7 +180,8 @@ func removeDups[T comparable](col []T, applyFn func(T) (T, bool)) []T {
 		}
 
 		if _, ok := ks[vv]; !ok {
-			uniq = append(uniq, vv)
+			quoted := shellescape.Quote(string(vv))
+			uniq = append(uniq, quoted)
 			ks[vv] = struct{}{}
 		}
 	}
@@ -193,4 +196,8 @@ var filterEmptyStrings = func(s string) (string, bool) {
 	}
 
 	return clean, false
+}
+
+func quoteAndClean(s string) string {
+	return shellescape.Quote(filepath.Clean(s))
 }
