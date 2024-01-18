@@ -180,7 +180,7 @@ func removeDups(col []string, applyFn func(string) (string, bool)) []string {
 		}
 
 		if _, ok := ks[vv]; !ok {
-			quoted := shellescape.Quote(string(vv))
+			quoted := shellescape.Quote(vv)
 			uniq = append(uniq, quoted)
 			ks[vv] = struct{}{}
 		}
