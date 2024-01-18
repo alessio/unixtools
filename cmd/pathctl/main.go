@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"al.essio.dev/pkg/tools/dirlist"
 	"al.essio.dev/pkg/tools/internal/version"
-	"al.essio.dev/pkg/tools/pathlist"
 )
 
 const (
@@ -27,7 +27,7 @@ var (
 	envVar string
 )
 
-var cmdHandlers map[string]func(d pathlist.List)
+var cmdHandlers map[string]func(d dirlist.List)
 
 func init() {
 	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
@@ -39,22 +39,22 @@ func init() {
 	flag.Usage = usage
 	flag.CommandLine.SetOutput(os.Stderr)
 
-	cmdHandlers = func() map[string]func(pathlist.List) {
-		hAppend := func(d pathlist.List) {
+	cmdHandlers = func() map[string]func(dirlist.List) {
+		hAppend := func(d dirlist.List) {
 			if dropMode {
 				d.Drop(flag.Arg(1))
 			}
 			d.Append(flag.Arg(1))
 		}
-		hDrop := func(d pathlist.List) { d.Drop(flag.Arg(1)) }
-		hPrepend := func(d pathlist.List) {
+		hDrop := func(d dirlist.List) { d.Drop(flag.Arg(1)) }
+		hPrepend := func(d dirlist.List) {
 			if dropMode {
 				d.Drop(flag.Arg(1))
 			}
 			d.Prepend(flag.Arg(1))
 		}
 
-		return map[string]func(pathlist.List){
+		return map[string]func(dirlist.List){
 			"append":  hAppend,
 			"drop":    hDrop,
 			"prepend": hPrepend,
@@ -75,7 +75,7 @@ func main() {
 
 	handleHelpAndVersionModes()
 
-	dirs := pathlist.New()
+	dirs := dirlist.New()
 	dirs.LoadEnv(envVar)
 
 	if flag.NArg() < 1 {
@@ -91,7 +91,7 @@ func main() {
 	}
 }
 
-func printPathList(d pathlist.List) {
+func printPathList(d dirlist.List) {
 	var sb = strings.Builder{}
 	sb.Reset()
 
