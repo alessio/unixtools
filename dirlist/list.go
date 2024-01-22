@@ -1,8 +1,9 @@
-// Package pathlist implements functions to manipulate PATH-like
+// Package dirlist implements functions to manipulate PATH-like
 // environment variables.
-package pathlist
+package dirlist
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
@@ -18,9 +19,6 @@ type List interface {
 
 	// Contains returns true if the list contains the path.
 	Contains(string) bool
-
-	// Nil returns true if the list is emppty.
-	Nil() bool
 
 	// Load reads the list of directories from a string.
 	Load(string)
@@ -60,15 +58,11 @@ func New() List {
 }
 
 func (d *dirList) Contains(p string) bool {
-	return slices.Contains(d.lst, p)
+	return slices.Contains(d.lst, filepath.Clean(p))
 }
 
 func (d *dirList) Reset() {
 	d.init()
-}
-
-func (d *dirList) Nil() bool {
-	return d.lst == nil || len(d.lst) == 0
 }
 
 func (d *dirList) Load(s string) {
@@ -80,26 +74,25 @@ func (d *dirList) LoadEnv(s string) {
 	d.Load(os.Getenv(s))
 }
 
-func (d *dirList) Slice() []string {
-	if d.Nil() {
-		return []string{}
+func (d *dirList) Slice() (dst []string) {
+	if len(d.lst) == 0 {
+		return
 	}
 
-	dst := make([]string, len(d.lst))
-	n := copy(dst, d.lst)
-	if n != len(d.lst) {
-		panic("couldn't copy the list")
+	dst = make([]string, len(d.lst))
+	if n := copy(dst, d.lst); n == len(d.lst) {
+		return dst
 	}
 
-	return dst
+	panic("couldn't copy the list")
 }
 
 func (d *dirList) String() string {
-	if !d.Nil() {
-		return strings.Join(d.lst, string(filepath.ListSeparator))
+	if len(d.lst) == 0 {
+		return ""
 	}
 
-	return ""
+	return strings.Join(d.lst, string(filepath.ListSeparator))
 }
 
 func (d *dirList) load() {
@@ -108,7 +101,7 @@ func (d *dirList) load() {
 
 func (d *dirList) Append(path string) {
 	p := filepath.Clean(path)
-	if d.Nil() {
+	if len(d.lst) == 0 {
 		d.lst = []string{p}
 		return
 	}
@@ -119,9 +112,10 @@ func (d *dirList) Append(path string) {
 }
 
 func (d *dirList) Drop(path string) {
-	if d.Nil() {
+	if len(d.lst) == 0 {
 		return
 	}
+
 	p := filepath.Clean(path)
 
 	if idx := slices.Index(d.lst, p); idx != -1 {
@@ -131,7 +125,7 @@ func (d *dirList) Drop(path string) {
 
 func (d *dirList) Prepend(path string) {
 	p := filepath.Clean(path)
-	if d.Nil() {
+	if len(d.lst) == 0 {
 		d.lst = []string{p}
 		return
 	}
@@ -147,12 +141,16 @@ func (d *dirList) init() {
 }
 
 func (d *dirList) cleanPathVar() []string {
-	if d.src == "" {
+	return cleanPathVar(d.src)
+}
+
+func cleanPathVar(src string) []string {
+	if src == "" {
 		return nil
 	}
 
-	pthSlice := filepath.SplitList(d.src)
-	if pthSlice == nil {
+	pthSlice := filepath.SplitList(src)
+	if len(pthSlice) == 0 {
 		return nil
 	}
 
@@ -161,15 +159,20 @@ func (d *dirList) cleanPathVar() []string {
 
 func (d *dirList) clone(o *dirList) *dirList {
 	o.src = d.src
-	o.lst = make([]string, len(d.lst))
-	copy(o.lst, d.lst)
+
+	n := len(d.lst)
+	o.lst = make([]string, n)
+
+	if m := copy(o.lst, d.lst); n != m {
+		panic(fmt.Sprintf("copy: expected %d items, got %d", n, m))
+	}
 
 	return o
 }
 
-func removeDups[T comparable](col []T, applyFn func(T) (T, bool)) []T {
-	var uniq = make([]T, 0)
-	ks := make(map[T]interface{})
+func removeDups(col []string, applyFn func(string) (string, bool)) []string {
+	var uniq = make([]string, 0)
+	ks := make(map[string]interface{})
 
 	for _, el := range col {
 		vv, ok := applyFn(el)
@@ -177,6 +180,7 @@ func removeDups[T comparable](col []T, applyFn func(T) (T, bool)) []T {
 			continue
 		}
 
+		vv = filepath.Join(filepath.Split(vv))
 		if _, ok := ks[vv]; !ok {
 			uniq = append(uniq, vv)
 			ks[vv] = struct{}{}
@@ -187,10 +191,11 @@ func removeDups[T comparable](col []T, applyFn func(T) (T, bool)) []T {
 }
 
 var filterEmptyStrings = func(s string) (string, bool) {
-	clean := filepath.Clean(s)
-	if clean != "" {
-		return clean, true
+	if strings.TrimSpace(s) == "" {
+		return s, false
 	}
 
-	return clean, false
+	// It'd pointless to check filepath.Clean()'s return
+	// value's nil-ness as it would never be "".
+	return filepath.Clean(s), true
 }
