@@ -202,13 +202,7 @@ var filterEmptyStrings = func(s string) (string, bool) {
 		return s, false
 	}
 
-	// I removed the following because filepath.Clean()
-	// never returns "".
-	//
-	// clean := filepath.Clean(s)
-	// if clean == "" {
-	// 	return clean, false
-	// }
-
+	// It'd pointless to check filepath.Clean()'s return
+	// value's nil-ness as it would never be "".
 	return filepath.Clean(s), true
 }
