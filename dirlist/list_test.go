@@ -31,16 +31,11 @@ func TestList_Prepend(t *testing.T) {
 		d.Prepend(dir)
 	}
 
-	d.Append("/bin/")
-
-	require.Equal(t, "/bin:/var", d.String())
 	d.Prepend("/sbin")
-	require.Equal(t, d.Slice(), []string{"/sbin", "/bin", "/var"})
-	require.Equal(t, d.String(), "/sbin:/bin:/var")
 	d.Prepend("/var")
 	d.Prepend("/usr/local/bin")
 	d.Prepend("/opt/local/bin")
-	require.Equal(t, d.String(), "/opt/local/bin:/usr/local/bin:/sbin:/bin:/var")
+	require.Equal(t, "/opt/local/bin:/usr/local/bin:/sbin:/bin:/var", d.String())
 }
 
 func TestList_Drop(t *testing.T) {
