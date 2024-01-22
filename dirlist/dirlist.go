@@ -11,7 +11,7 @@ func init() {
 func Reset() { dList.Reset() }
 
 func Contains(p string) bool {
-	return dList.Contains(quoteAndClean(p))
+	return dList.Contains(p)
 }
 
 func Load(s string) {

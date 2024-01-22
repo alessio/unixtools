@@ -61,6 +61,13 @@ func TestList_Drop(t *testing.T) {
 	require.Equal(t, "", d.String())
 
 	require.NotPanics(t, func() { dirlist.New().Drop("") })
+
+	d1 := dirlist.New()
+	d1.Load(`/Library/Application Support:/Library/Application Support/`)
+	require.Equal(t, []string{"/Library/Application Support"}, d1.Slice())
+	require.True(t, d1.Contains("/Library/Application Support"))
+	d1.Drop("/Library/Application Support")
+	require.False(t, d1.Contains("/Library/Application Support"))
 }
 
 func TestList_Reset(t *testing.T) {

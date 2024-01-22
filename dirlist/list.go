@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
-
-	"github.com/alessio/shellescape"
 )
 
 // List builds a list of directories by parsing PATH-like variables
@@ -63,7 +61,7 @@ func New() List {
 }
 
 func (d *dirList) Contains(p string) bool {
-	return slices.Contains(d.lst, quoteAndClean(p))
+	return slices.Contains(d.lst, filepath.Clean(p))
 }
 
 func (d *dirList) Reset() {
@@ -109,7 +107,7 @@ func (d *dirList) load() {
 }
 
 func (d *dirList) Append(path string) {
-	p := quoteAndClean(path)
+	p := filepath.Clean(path)
 	if len(d.lst) == 0 {
 		d.lst = []string{p}
 		return
@@ -125,7 +123,7 @@ func (d *dirList) Drop(path string) {
 		return
 	}
 
-	p := quoteAndClean(path)
+	p := filepath.Clean(path)
 
 	if idx := slices.Index(d.lst, p); idx != -1 {
 		d.lst = slices.Delete(d.lst, idx, idx+1)
@@ -133,7 +131,7 @@ func (d *dirList) Drop(path string) {
 }
 
 func (d *dirList) Prepend(path string) {
-	p := quoteAndClean(path)
+	p := filepath.Clean(path)
 	if len(d.lst) == 0 {
 		d.lst = []string{p}
 		return
@@ -189,9 +187,9 @@ func removeDups(col []string, applyFn func(string) (string, bool)) []string {
 			continue
 		}
 
+		vv = filepath.Join(filepath.Split(vv))
 		if _, ok := ks[vv]; !ok {
-			quoted := shellescape.Quote(vv)
-			uniq = append(uniq, quoted)
+			uniq = append(uniq, vv)
 			ks[vv] = struct{}{}
 		}
 	}
@@ -213,8 +211,4 @@ var filterEmptyStrings = func(s string) (string, bool) {
 	// }
 
 	return filepath.Clean(s), true
-}
-
-func quoteAndClean(s string) string {
-	return shellescape.Quote(filepath.Clean(s))
 }
