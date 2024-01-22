@@ -12,14 +12,14 @@ import (
 )
 
 const (
-	programme = "pathctl"
+	program = "pathctl"
 )
 
 var (
 	helpMode     bool
 	versionMode  bool
 	listMode     bool
-	noprefixMode bool
+	noPrefixMode bool
 	dropMode     bool
 )
 
@@ -33,43 +33,29 @@ func init() {
 	flag.BoolVar(&helpMode, "help", false, "display this help and exit.")
 	flag.BoolVar(&versionMode, "version", false, "output version information and exit.")
 	flag.BoolVar(&dropMode, "D", false, "drop the path before adding it again to the list.")
-	flag.BoolVar(&noprefixMode, "noprefix", false, "output the variable contents only.")
+	flag.BoolVar(&noPrefixMode, "noprefix", false, "output the variable contents only.")
 	flag.BoolVar(&listMode, "L", false, "use a newline character as path list separator.")
 	flag.StringVar(&envVar, "E", "PATH", "input environment variable.")
 	flag.Usage = usage
 	flag.CommandLine.SetOutput(os.Stderr)
 
 	cmdHandlers = func() map[string]func(dirlist.List) {
-		hAppend := func(d dirlist.List) {
-			if dropMode {
-				d.Drop(flag.Arg(1))
-			}
-			d.Append(flag.Arg(1))
-		}
-		hDrop := func(d dirlist.List) { d.Drop(flag.Arg(1)) }
-		hPrepend := func(d dirlist.List) {
-			if dropMode {
-				d.Drop(flag.Arg(1))
-			}
-			d.Prepend(flag.Arg(1))
-		}
-
 		return map[string]func(dirlist.List){
-			"append":  hAppend,
-			"drop":    hDrop,
-			"prepend": hPrepend,
+			"append":  cmdHandlerAppend,
+			"drop":    cmdHandlerDrop,
+			"prepend": cmdHandlerPrepend,
 
 			// aliases
-			"a": hAppend,
-			"d": hDrop,
-			"p": hPrepend,
+			"a": cmdHandlerAppend,
+			"d": cmdHandlerDrop,
+			"p": cmdHandlerPrepend,
 		}
 	}()
 }
 
 func main() {
 	log.SetFlags(0)
-	log.SetPrefix(fmt.Sprintf("%s: ", programme))
+	log.SetPrefix(fmt.Sprintf("%s: ", program))
 	log.SetOutput(os.Stderr)
 	flag.Parse()
 
@@ -95,7 +81,7 @@ func printPathList(d dirlist.List) {
 	var sb = strings.Builder{}
 	sb.Reset()
 
-	printPrefix := !noprefixMode
+	printPrefix := !noPrefixMode
 
 	switch {
 	case listMode:
@@ -138,7 +124,7 @@ Commands:
    prepend, p          prepend a path to the list.
 
 Options:
-`, programme)
+`, program)
 	_, _ = fmt.Fprintln(os.Stderr, s)
 
 	flag.PrintDefaults()
@@ -151,4 +137,22 @@ element of the path list.
 
 If COMMAND is not provided, it prints the contents of the PATH
 environment variable.`)
+}
+
+func cmdHandlerAppend(d dirlist.List) {
+	if dropMode {
+		d.Drop(flag.Arg(1))
+	}
+	d.Append(flag.Arg(1))
+}
+
+func cmdHandlerDrop(d dirlist.List) {
+	d.Drop(flag.Arg(1))
+}
+
+func cmdHandlerPrepend(d dirlist.List) {
+	if dropMode {
+		d.Drop(flag.Arg(1))
+	}
+	d.Prepend(flag.Arg(1))
 }
