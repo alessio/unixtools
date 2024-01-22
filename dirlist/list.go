@@ -20,9 +20,6 @@ type List interface {
 	// Contains returns true if the list contains the path.
 	Contains(string) bool
 
-	// Nil returns true if the list is emppty.
-	//	Nil() bool
-
 	// Load reads the list of directories from a string.
 	Load(string)
 
