@@ -68,10 +68,6 @@ func (d *dirList) Reset() {
 	d.init()
 }
 
-// func (d *dirList) Nil() bool {
-// 	return d.l == nil || len(d.l) == 0
-// }
-
 func (d *dirList) Load(s string) {
 	d.src = s
 	d.load()
