@@ -23,3 +23,5 @@ generate-stamp
 
 .envrc
 version.txt
+
+.vscode
