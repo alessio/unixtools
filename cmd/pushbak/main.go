@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -46,7 +45,7 @@ func main() {
 }
 
 func backupDirectory(target string, backups *dirsnapshots.Backups) error {
-	backupDir, err := ioutil.TempDir(backups.SnapshotsDir(), "")
+	backupDir, err := os.MkdirTemp(backups.SnapshotsDir(), "")
 	if err != nil {
 		return err
 	}

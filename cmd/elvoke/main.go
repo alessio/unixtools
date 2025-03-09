@@ -149,7 +149,7 @@ func ensureCache() {
 	cachedir = path.Join(homedir, ".elvoke")
 
 	info, err := os.Stat(cachedir)
-	if info.IsDir() && err == nil {
+	if err == nil && info.IsDir() {
 		return
 	}
 

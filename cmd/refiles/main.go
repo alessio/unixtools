@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -49,7 +49,7 @@ func main() {
 	}
 
 	replace := flag.Arg(1)
-	verboseWriter := ioutil.Discard
+	verboseWriter := io.Discard
 
 	if verboseMode || simulateMode {
 		verboseWriter = os.Stderr
