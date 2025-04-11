@@ -1,4 +1,4 @@
-q#!/bin/bash
+#!/bin/bash
 
 # Generate application uninstallers for macOS.
 
