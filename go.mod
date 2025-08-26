@@ -2,7 +2,7 @@ module al.essio.dev/pkg/tools
 
 go 1.21
 
-require github.com/stretchr/testify v1.10.0
+require github.com/stretchr/testify v1.11.0
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
