@@ -343,7 +343,7 @@ func (r *Runner) createTempImageSandboxSafe() error {
 // Verbosity levels: 1 = quiet, 2 = verbose, 3+ = debug.
 // Returns the original args if verbosity is 0 or args is empty.
 func (r *Runner) setHdiutilVerbosity(args []string) []string {
-	if len(args) == 0 || r.HDIUtilVerbosity == 0 {
+	if len(args) == 0 || r.HDIUtilVerbosity <= 0 {
 		return args
 	}
 
