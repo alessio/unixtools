@@ -125,6 +125,8 @@ func (c *Config) Validate() error {
 		{"volume_name", c.VolumeName},
 		{"signing_identity", c.SigningIdentity},
 		{"notarize_credentials", c.NotarizeCredentials},
+		{"filesystem", c.FileSystem},
+		{"image_format", c.ImageFormat},
 	} {
 		if strings.ContainsRune(check.val, 0) {
 			return fmt.Errorf("%w: %s contains a null byte", ErrUnsafeArg, check.name)
