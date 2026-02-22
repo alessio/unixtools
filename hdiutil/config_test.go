@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"al.essio.dev/cmd/mkdmg/pkg/hdiutil"
+	"al.essio.dev/pkg/tools/hdiutil"
 )
 
 func TestConfig_Validate(t *testing.T) {

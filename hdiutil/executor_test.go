@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"al.essio.dev/cmd/mkdmg/pkg/hdiutil"
+	"al.essio.dev/pkg/tools/hdiutil"
 )
 
 // mockExecutor records executed commands and allows configuring responses.

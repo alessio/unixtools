@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"al.essio.dev/cmd/mkdmg/pkg/hdiutil"
+	"al.essio.dev/pkg/tools/hdiutil"
 )
 
 func TestSetLogWriter(t *testing.T) {
