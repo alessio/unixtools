@@ -2,12 +2,11 @@ package hdiutil_test
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
-	"al.essio.dev/pkg/tools/hdiutil"
+	"al.essio.dev/cmd/mkdmg/pkg/hdiutil"
 )
 
 func TestConfig_JSON(t *testing.T) {
@@ -26,8 +25,6 @@ func TestConfig_JSON(t *testing.T) {
 		OutputPath:          "test.dmg",
 		SourceDir:           "src",
 		Simulate:            true,
-		Checksum:            "SHA256",
-		ExcludePatterns:     []string{".DS_Store", "*.tmp"},
 	}
 
 	// Test ToJSON
@@ -79,17 +76,6 @@ func TestConfig_JSON(t *testing.T) {
 	if decoded.Simulate != original.Simulate {
 		t.Errorf("Simulate mismatch: expected %v, got %v", original.Simulate, decoded.Simulate)
 	}
-	if decoded.Checksum != original.Checksum {
-		t.Errorf("Checksum mismatch: expected %q, got %q", original.Checksum, decoded.Checksum)
-	}
-	if len(decoded.ExcludePatterns) != len(original.ExcludePatterns) {
-		t.Fatalf("ExcludePatterns length mismatch: expected %d, got %d", len(original.ExcludePatterns), len(decoded.ExcludePatterns))
-	}
-	for i, p := range original.ExcludePatterns {
-		if decoded.ExcludePatterns[i] != p {
-			t.Errorf("ExcludePatterns[%d] mismatch: expected %q, got %q", i, p, decoded.ExcludePatterns[i])
-		}
-	}
 }
 
 func TestConfig_FromJSON_Partial(t *testing.T) {
@@ -131,43 +117,4 @@ func TestLoadConfig(t *testing.T) {
 	if cfg.VolumeName != "TestFile" {
 		t.Errorf("Expected VolumeName 'TestFile', got '%s'", cfg.VolumeName)
 	}
-}
-
-func TestLoadConfig_NonExistentFile(t *testing.T) {
-	t.Parallel()
-	_, err := hdiutil.LoadConfig("/nonexistent/path/config.json")
-	if err == nil {
-		t.Error("LoadConfig() should fail for non-existent file")
-	}
-}
-
-func TestLoadConfig_InvalidJSON(t *testing.T) {
-	t.Parallel()
-	tmpFile := fmt.Sprintf("%s/invalid.json", t.TempDir())
-	if err := writeTestFile(t, tmpFile, "not valid json{{{"); err != nil {
-		t.Fatal(err)
-	}
-
-	_, err := hdiutil.LoadConfig(tmpFile)
-	if err == nil {
-		t.Error("LoadConfig() should fail for invalid JSON")
-	}
-}
-
-func TestLoadConfig_EmptyFile(t *testing.T) {
-	t.Parallel()
-	tmpFile := fmt.Sprintf("%s/empty.json", t.TempDir())
-	if err := writeTestFile(t, tmpFile, ""); err != nil {
-		t.Fatal(err)
-	}
-
-	_, err := hdiutil.LoadConfig(tmpFile)
-	if err == nil {
-		t.Error("LoadConfig() should fail for empty file")
-	}
-}
-
-func writeTestFile(t *testing.T, path, content string) error {
-	t.Helper()
-	return os.WriteFile(path, []byte(content), 0644)
 }

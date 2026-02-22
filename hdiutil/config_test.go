@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"al.essio.dev/pkg/tools/hdiutil"
+	"al.essio.dev/cmd/mkdmg/pkg/hdiutil"
 )
 
 func TestConfig_Validate(t *testing.T) {
@@ -79,38 +79,6 @@ func TestConfig_Validate(t *testing.T) {
 			name:    "sandbox_safe_with_apfs_mixed_case_returns_error",
 			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg", SandboxSafe: true, FileSystem: "Apfs"},
 			wantErr: hdiutil.ErrSandboxAPFS,
-		},
-
-		// Checksum validation
-		{
-			name:    "valid_checksum_sha256",
-			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg", Checksum: "SHA256"},
-			wantErr: nil,
-		},
-		{
-			name:    "valid_checksum_sha512",
-			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg", Checksum: "SHA512"},
-			wantErr: nil,
-		},
-		{
-			name:    "valid_checksum_lowercase",
-			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg", Checksum: "sha256"},
-			wantErr: nil,
-		},
-		{
-			name:    "valid_checksum_sha512_lowercase",
-			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg", Checksum: "sha512"},
-			wantErr: nil,
-		},
-		{
-			name:    "invalid_checksum_algorithm",
-			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg", Checksum: "CRC32"},
-			wantErr: hdiutil.ErrInvChecksumAlgo,
-		},
-		{
-			name:    "empty_checksum_is_valid",
-			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg", Checksum: ""},
-			wantErr: nil,
 		},
 
 		// Valid configurations

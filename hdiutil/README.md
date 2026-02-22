@@ -21,7 +21,7 @@ It allows programmatic control over the entire DMG lifecycle, from creating writ
 ## 📦 Installation
 
 ```sh
-go get al.essio.dev/pkg/tools/hdiutil
+go get al.essio.dev/cmd/mkdmg/pkg/hdiutil
 ```
 
 ## 🚀 Usage
@@ -34,7 +34,7 @@ package main
 import (
 	"log"
 
-	"al.essio.dev/pkg/tools/hdiutil"
+	"al.essio.dev/cmd/mkdmg/pkg/hdiutil"
 )
 
 func main() {

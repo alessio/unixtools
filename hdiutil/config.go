@@ -43,13 +43,6 @@ type Config struct {
 	// Simulate enables dry-run mode without actually creating the DMG.
 	Simulate bool `json:"simulate,omitempty"`
 
-	// Checksum specifies the hash algorithm for generating a checksum file alongside the DMG.
-	// Supported values: "SHA256", "SHA512". If empty, no checksum is generated.
-	Checksum string `json:"checksum,omitempty"`
-
-	// ExcludePatterns is a list of glob patterns for files to exclude from the DMG.
-	ExcludePatterns []string `json:"exclude_patterns,omitempty"`
-
 	valid bool
 
 	// FilesystemOpts returns the hdiutil arguments for the configured filesystem.
@@ -144,15 +137,6 @@ func (c *Config) Validate() error {
 	// sandbox safe and APFS are mutually exclusive
 	if c.SandboxSafe && strings.ToUpper(c.FileSystem) == "APFS" {
 		return ErrSandboxAPFS
-	}
-
-	if c.Checksum != "" {
-		switch strings.ToUpper(c.Checksum) {
-		case "SHA256", "SHA512":
-			// valid
-		default:
-			return ErrInvChecksumAlgo
-		}
 	}
 
 	c.valid = true
