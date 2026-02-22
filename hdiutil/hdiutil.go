@@ -384,7 +384,7 @@ func (r *Runner) init() error {
 	// create a working directory
 	tmpDir, err := os.MkdirTemp("", "mkdmg-")
 	if err != nil {
-		return fmt.Errorf("%v: %w", ErrCreateDir, err)
+		return fmt.Errorf("%w: %w", ErrCreateDir, err)
 	}
 	r.tmpDir = tmpDir
 
