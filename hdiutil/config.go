@@ -107,6 +107,8 @@ func LoadConfig(path string) (*Config, error) {
 // Validate checks the configuration for errors and initializes the option functions.
 // It must be called before using FilesystemOpts, ImageFormatOpts, VolumeSizeOpts, or VolumeNameOpt.
 // Returns an error if:
+//   - Any string field contains a null byte
+//   - SourceDir or OutputPath starts with a dash (argument injection)
 //   - SourceDir is empty
 //   - OutputPath does not have a .dmg extension
 //   - ImageFormat is invalid
@@ -114,6 +116,30 @@ func LoadConfig(path string) (*Config, error) {
 //   - SandboxSafe is enabled with APFS filesystem
 func (c *Config) Validate() error {
 	c.valid = false
+
+	// Reject null bytes in all user-supplied string fields to prevent
+	// argument truncation when passed to external commands.
+	for _, check := range []struct{ name, val string }{
+		{"source_dir", c.SourceDir},
+		{"output_path", c.OutputPath},
+		{"volume_name", c.VolumeName},
+		{"signing_identity", c.SigningIdentity},
+		{"notarize_credentials", c.NotarizeCredentials},
+	} {
+		if strings.ContainsRune(check.val, 0) {
+			return fmt.Errorf("%w: %s contains a null byte", ErrUnsafeArg, check.name)
+		}
+	}
+
+	// Paths starting with a dash after cleaning could be interpreted as
+	// flags by external commands (argument/flag injection).
+	if c.SourceDir != "" && strings.HasPrefix(filepath.Clean(c.SourceDir), "-") {
+		return fmt.Errorf("%w: source_dir must not start with a dash", ErrUnsafeArg)
+	}
+	if c.OutputPath != "" && strings.HasPrefix(filepath.Clean(c.OutputPath), "-") {
+		return fmt.Errorf("%w: output_path must not start with a dash", ErrUnsafeArg)
+	}
+
 	if len(c.SourceDir) == 0 {
 		return ErrInvSourceDir
 	}

@@ -16,6 +16,43 @@ func TestConfig_Validate(t *testing.T) {
 		config  hdiutil.Config
 		wantErr error
 	}{
+		// Argument injection prevention
+		{
+			name:    "null_byte_in_source_dir",
+			config:  hdiutil.Config{SourceDir: "src\x00evil", OutputPath: "test.dmg"},
+			wantErr: hdiutil.ErrUnsafeArg,
+		},
+		{
+			name:    "null_byte_in_output_path",
+			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg\x00evil"},
+			wantErr: hdiutil.ErrUnsafeArg,
+		},
+		{
+			name:    "null_byte_in_volume_name",
+			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg", VolumeName: "vol\x00evil"},
+			wantErr: hdiutil.ErrUnsafeArg,
+		},
+		{
+			name:    "null_byte_in_signing_identity",
+			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg", SigningIdentity: "id\x00evil"},
+			wantErr: hdiutil.ErrUnsafeArg,
+		},
+		{
+			name:    "null_byte_in_notarize_credentials",
+			config:  hdiutil.Config{SourceDir: "src", OutputPath: "test.dmg", NotarizeCredentials: "cred\x00evil"},
+			wantErr: hdiutil.ErrUnsafeArg,
+		},
+		{
+			name:    "dash_prefix_source_dir",
+			config:  hdiutil.Config{SourceDir: "-evil", OutputPath: "test.dmg"},
+			wantErr: hdiutil.ErrUnsafeArg,
+		},
+		{
+			name:    "dash_prefix_output_path",
+			config:  hdiutil.Config{SourceDir: "src", OutputPath: "-evil.dmg"},
+			wantErr: hdiutil.ErrUnsafeArg,
+		},
+
 		// SourceDir validation
 		{
 			name:    "empty_source_dir_returns_error",

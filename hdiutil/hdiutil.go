@@ -36,7 +36,20 @@ var (
 	ErrSandboxAPFS = errors.New("creating an APFS disk image that is sandbox safe is not supported")
 	// ErrNeedInit indicates Runner.Setup was not called before attempting operations.
 	ErrNeedInit = errors.New("runner not properly initialized, call Setup() first")
+	// ErrUnsafeArg indicates a config value contains characters unsafe for command arguments.
+	ErrUnsafeArg = errors.New("argument contains unsafe characters")
+	// ErrCommandNotAllowed indicates an attempt to run a command not in the allowlist.
+	ErrCommandNotAllowed = errors.New("command not allowed")
 )
+
+// allowedCommands is the set of external commands the runner may execute.
+var allowedCommands = map[string]struct{}{
+	"hdiutil":  {},
+	"codesign": {},
+	"xcrun":    {},
+	"chmod":    {},
+	"bless":    {},
+}
 
 var (
 	verboseLog *log.Logger
@@ -61,15 +74,36 @@ type CommandExecutor interface {
 
 type realCommandExecutor struct{}
 
+// resolveCommand validates that name is in the allowlist and resolves its
+// absolute path via exec.LookPath, preventing arbitrary command execution.
+func resolveCommand(name string) (string, error) {
+	if _, ok := allowedCommands[name]; !ok {
+		return "", fmt.Errorf("%w: %s", ErrCommandNotAllowed, name)
+	}
+	binPath, err := exec.LookPath(name)
+	if err != nil {
+		return "", fmt.Errorf("command not found: %s: %w", name, err)
+	}
+	return binPath, nil
+}
+
 func (e *realCommandExecutor) Run(name string, args ...string) error {
-	cmd := exec.Command(name, args...)
+	binPath, err := resolveCommand(name)
+	if err != nil {
+		return err
+	}
+	cmd := exec.Command(binPath, args...) // #nosec G204 -- binPath is resolved from allowedCommands via LookPath
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
 
 func (e *realCommandExecutor) RunOutput(name string, args ...string) (string, error) {
-	cmd := exec.Command(name, args...)
+	binPath, err := resolveCommand(name)
+	if err != nil {
+		return "", err
+	}
+	cmd := exec.Command(binPath, args...) // #nosec G204 -- binPath is resolved from allowedCommands via LookPath
 	output, err := cmd.CombinedOutput()
 	return string(output), err
 }
@@ -333,7 +367,7 @@ func (r *Runner) init() error {
 	}
 
 	r.srcDir = filepath.Clean(r.SourceDir)
-	r.finalDmg = r.OutputPath
+	r.finalDmg = filepath.Clean(r.OutputPath)
 
 	r.volNameOpt = r.VolumeNameOpt()
 	r.formatOpts = r.ImageFormatOpts()
