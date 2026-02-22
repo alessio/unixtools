@@ -38,18 +38,7 @@ var (
 	ErrNeedInit = errors.New("runner not properly initialized, call Setup() first")
 	// ErrUnsafeArg indicates a config value contains characters unsafe for command arguments.
 	ErrUnsafeArg = errors.New("argument contains unsafe characters")
-	// ErrCommandNotAllowed indicates an attempt to run a command not in the allowlist.
-	ErrCommandNotAllowed = errors.New("command not allowed")
 )
-
-// allowedCommands is the set of external commands the runner may execute.
-var allowedCommands = map[string]struct{}{
-	"hdiutil":  {},
-	"codesign": {},
-	"xcrun":    {},
-	"chmod":    {},
-	"bless":    {},
-}
 
 var (
 	verboseLog *log.Logger
@@ -67,51 +56,63 @@ func SetLogWriter(w io.Writer) {
 }
 
 // CommandExecutor defines the interface for executing external commands.
+// Each method corresponds to a specific allowed command, ensuring that only
+// known binaries can be invoked and satisfying static analysis requirements.
 type CommandExecutor interface {
-	Run(name string, args ...string) error
-	RunOutput(name string, args ...string) (string, error)
+	Hdiutil(args ...string) error
+	HdiutilOutput(args ...string) (string, error)
+	Codesign(args ...string) error
+	Xcrun(args ...string) error
+	XcrunOutput(args ...string) (string, error)
+	Chmod(args ...string) error
+	Bless(args ...string) error
 }
 
 type realCommandExecutor struct{}
 
-// resolveCommand validates that name is in the allowlist and resolves its
-// absolute path via exec.LookPath, preventing arbitrary command execution.
-func resolveCommand(name string) (string, error) {
-	if _, ok := allowedCommands[name]; !ok {
-		return "", fmt.Errorf("%w: %s", ErrCommandNotAllowed, name)
-	}
-	binPath, err := exec.LookPath(name)
-	if err != nil {
-		return "", fmt.Errorf("command not found: %s: %w", name, err)
-	}
-	return binPath, nil
-}
-
-func (e *realCommandExecutor) Run(name string, args ...string) error {
-	binPath, err := resolveCommand(name)
-	if err != nil {
-		return err
-	}
-	cmd := &exec.Cmd{
-		Path:   binPath,
-		Args:   append([]string{binPath}, args...),
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-	}
+func (e *realCommandExecutor) Hdiutil(args ...string) error {
+	cmd := exec.Command("hdiutil", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
 
-func (e *realCommandExecutor) RunOutput(name string, args ...string) (string, error) {
-	binPath, err := resolveCommand(name)
-	if err != nil {
-		return "", err
-	}
-	cmd := &exec.Cmd{
-		Path: binPath,
-		Args: append([]string{binPath}, args...),
-	}
-	output, err := cmd.CombinedOutput()
+func (e *realCommandExecutor) HdiutilOutput(args ...string) (string, error) {
+	output, err := exec.Command("hdiutil", args...).CombinedOutput()
 	return string(output), err
+}
+
+func (e *realCommandExecutor) Codesign(args ...string) error {
+	cmd := exec.Command("codesign", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func (e *realCommandExecutor) Xcrun(args ...string) error {
+	cmd := exec.Command("xcrun", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func (e *realCommandExecutor) XcrunOutput(args ...string) (string, error) {
+	output, err := exec.Command("xcrun", args...).CombinedOutput()
+	return string(output), err
+}
+
+func (e *realCommandExecutor) Chmod(args ...string) error {
+	cmd := exec.Command("chmod", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func (e *realCommandExecutor) Bless(args ...string) error {
+	cmd := exec.Command("bless", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
 
 // Option is a functional option for configuring a Runner.
@@ -246,7 +247,7 @@ func (r *Runner) Bless() error {
 		return nil
 	}
 
-	return r.runCommand("bless", "--folder", r.mountDir)
+	return r.runBless("--folder", r.mountDir)
 }
 
 // FinalizeDMG converts the temporary writable image to the final compressed format
@@ -268,11 +269,11 @@ func (r *Runner) Codesign() error {
 		return nil
 	}
 
-	if err := r.runCommand("codesign", "-s", r.signOpt, r.finalDmg); err != nil {
+	if err := r.runCodesign("-s", r.signOpt, r.finalDmg); err != nil {
 		return fmt.Errorf("%w: codesign command failed: %v", ErrCodesignFailed, err)
 	}
 
-	if err := r.runCommand("codesign",
+	if err := r.runCodesign(
 		"--verify", "--deep", "--strict", "--verbose=2", r.finalDmg); err != nil {
 		return fmt.Errorf("%w: the signature seems invalid: %v", ErrCodesignFailed, err)
 	}
@@ -292,15 +293,15 @@ func (r *Runner) Notarize() error {
 	}
 
 	verboseLog.Println("Start notarization")
-	if err := r.runCommand("xcrun", "notarytool", "submit",
+	if err := r.runXcrun("notarytool", "submit",
 		r.finalDmg, "--keychain-profile", r.notarizeOpt,
 	); err != nil {
 		return fmt.Errorf("%w: notarization failed: %v", ErrNotarizeFailed, err)
 	}
 
 	verboseLog.Println("Stapling the notarization ticket")
-	if output, err := r.runCommandOutput(
-		"xcrun", "stapler", "staple", r.finalDmg); err != nil {
+	if output, err := r.runXcrunOutput(
+		"stapler", "staple", r.finalDmg); err != nil {
 		return fmt.Errorf("%w: stapler failed: %v (output: %s)", ErrNotarizeFailed, err, output)
 	}
 
@@ -411,9 +412,7 @@ func (r *Runner) fixPermissions() error {
 	}
 
 	verboseLog.Println("Fixing permissions")
-	if err := r.runCommand("chmod", []string{
-		"-Rf", "go-w", r.mountDir,
-	}...); err != nil {
+	if err := r.runChmod("-Rf", "go-w", r.mountDir); err != nil {
 		return fmt.Errorf("chmod failed: %w", err)
 	}
 
@@ -421,32 +420,61 @@ func (r *Runner) fixPermissions() error {
 	return nil
 }
 
-// runHdiutil executes hdiutil with the given arguments.
-// In simulation mode, logs the command without executing it.
+// Command runner helpers — each logs, checks simulate mode, and delegates
+// to the corresponding typed CommandExecutor method.
+
 func (r *Runner) runHdiutil(args ...string) error {
-	return r.runCommand("hdiutil", args...)
-}
-
-// runHdiutilOutput executes hdiutil with the given arguments and returns the combined output.
-// In simulation mode, logs the command and returns an empty string.
-func (r *Runner) runHdiutilOutput(args ...string) (string, error) {
-	return r.runCommandOutput("hdiutil", args...)
-}
-
-// runCommand executes an external command.
-func (r *Runner) runCommand(name string, args ...string) error {
-	verboseLog.Println("Running '", name, args)
+	verboseLog.Println("Running 'hdiutil", args)
 	if r.Simulate {
 		return nil
 	}
-	return r.executor.Run(name, args...)
+	return r.executor.Hdiutil(args...)
 }
 
-// runCommandOutput executes an external command and returns the combined output as a string.
-func (r *Runner) runCommandOutput(name string, args ...string) (string, error) {
-	verboseLog.Println("Running '", name, args)
+func (r *Runner) runHdiutilOutput(args ...string) (string, error) {
+	verboseLog.Println("Running 'hdiutil", args)
 	if r.Simulate {
 		return "", nil
 	}
-	return r.executor.RunOutput(name, args...)
+	return r.executor.HdiutilOutput(args...)
+}
+
+func (r *Runner) runCodesign(args ...string) error {
+	verboseLog.Println("Running 'codesign", args)
+	if r.Simulate {
+		return nil
+	}
+	return r.executor.Codesign(args...)
+}
+
+func (r *Runner) runXcrun(args ...string) error {
+	verboseLog.Println("Running 'xcrun", args)
+	if r.Simulate {
+		return nil
+	}
+	return r.executor.Xcrun(args...)
+}
+
+func (r *Runner) runXcrunOutput(args ...string) (string, error) {
+	verboseLog.Println("Running 'xcrun", args)
+	if r.Simulate {
+		return "", nil
+	}
+	return r.executor.XcrunOutput(args...)
+}
+
+func (r *Runner) runChmod(args ...string) error {
+	verboseLog.Println("Running 'chmod", args)
+	if r.Simulate {
+		return nil
+	}
+	return r.executor.Chmod(args...)
+}
+
+func (r *Runner) runBless(args ...string) error {
+	verboseLog.Println("Running 'bless", args)
+	if r.Simulate {
+		return nil
+	}
+	return r.executor.Bless(args...)
 }

@@ -12,9 +12,8 @@ import (
 
 // mockExecutor records executed commands and allows configuring responses.
 type mockExecutor struct {
-	commands []executedCommand
-	runErr   error
-	// runOutputFn allows dynamic responses based on the command.
+	commands    []executedCommand
+	runErr      error
 	runOutputFn func(name string, args ...string) (string, error)
 }
 
@@ -23,12 +22,12 @@ type executedCommand struct {
 	Args []string
 }
 
-func (m *mockExecutor) Run(name string, args ...string) error {
+func (m *mockExecutor) recordRun(name string, args []string) error {
 	m.commands = append(m.commands, executedCommand{Name: name, Args: args})
 	return m.runErr
 }
 
-func (m *mockExecutor) RunOutput(name string, args ...string) (string, error) {
+func (m *mockExecutor) recordRunOutput(name string, args []string) (string, error) {
 	m.commands = append(m.commands, executedCommand{Name: name, Args: args})
 	if m.runOutputFn != nil {
 		return m.runOutputFn(name, args...)
@@ -36,18 +35,24 @@ func (m *mockExecutor) RunOutput(name string, args ...string) (string, error) {
 	return "", m.runErr
 }
 
+func (m *mockExecutor) Hdiutil(args ...string) error            { return m.recordRun("hdiutil", args) }
+func (m *mockExecutor) HdiutilOutput(args ...string) (string, error) {
+	return m.recordRunOutput("hdiutil", args)
+}
+func (m *mockExecutor) Codesign(args ...string) error { return m.recordRun("codesign", args) }
+func (m *mockExecutor) Xcrun(args ...string) error    { return m.recordRun("xcrun", args) }
+func (m *mockExecutor) XcrunOutput(args ...string) (string, error) {
+	return m.recordRunOutput("xcrun", args)
+}
+func (m *mockExecutor) Chmod(args ...string) error { return m.recordRun("chmod", args) }
+func (m *mockExecutor) Bless(args ...string) error { return m.recordRun("bless", args) }
+
 func (m *mockExecutor) lastCommand() (executedCommand, bool) {
 	if len(m.commands) == 0 {
 		return executedCommand{}, false
 	}
 	return m.commands[len(m.commands)-1], true
 }
-
-//func (m *mockExecutor) reset() {
-//	m.commands = nil
-//	m.runErr = nil
-//	m.runOutputFn = nil
-//}
 
 func newRunner(t *testing.T, cfg *hdiutil.Config, exec *mockExecutor) *hdiutil.Runner {
 	t.Helper()
@@ -224,7 +229,6 @@ func TestFixPermissions_Idempotent(t *testing.T) {
 	if err := r.DetachDiskImage(); err != nil {
 		t.Fatalf("first DetachDiskImage() error = %v", err)
 	}
-	firstCallCount := len(mock.commands)
 
 	// Second Bless should NOT re-run chmod (fixPermissions is idempotent)
 	mock.commands = nil
@@ -235,8 +239,6 @@ func TestFixPermissions_Idempotent(t *testing.T) {
 	if len(mock.commands) != 0 {
 		t.Errorf("fixPermissions should be a no-op on second call, but %d commands were executed", len(mock.commands))
 	}
-
-	_ = firstCallCount // suppress unused
 }
 
 func TestBless_WithMockExecutor(t *testing.T) {
@@ -351,11 +353,6 @@ func TestCodesign_SigningFails(t *testing.T) {
 func TestCodesign_VerificationFails(t *testing.T) {
 	t.Parallel()
 	callCount := 0
-	mock := &mockExecutor{}
-	// First call (sign) succeeds, second (verify) fails
-	origRun := mock.Run
-	_ = origRun
-	mock.runErr = nil
 	cfg := &hdiutil.Config{
 		SourceDir:       t.TempDir(),
 		OutputPath:      "test.dmg",
@@ -377,21 +374,29 @@ func TestCodesign_VerificationFails(t *testing.T) {
 	}
 }
 
-// verifyFailExecutor fails on the second Run call (signature verification).
+// noopExecutor provides a no-op base for test executors that only override specific methods.
+type noopExecutor struct{}
+
+func (noopExecutor) Hdiutil(args ...string) error                     { return nil }
+func (noopExecutor) HdiutilOutput(args ...string) (string, error)     { return "", nil }
+func (noopExecutor) Codesign(args ...string) error                    { return nil }
+func (noopExecutor) Xcrun(args ...string) error                       { return nil }
+func (noopExecutor) XcrunOutput(args ...string) (string, error)       { return "", nil }
+func (noopExecutor) Chmod(args ...string) error                       { return nil }
+func (noopExecutor) Bless(args ...string) error                       { return nil }
+
+// verifyFailExecutor fails on the second Codesign call (signature verification).
 type verifyFailExecutor struct {
+	noopExecutor
 	callCount *int
 }
 
-func (e *verifyFailExecutor) Run(name string, args ...string) error {
+func (e *verifyFailExecutor) Codesign(args ...string) error {
 	*e.callCount++
 	if *e.callCount >= 2 {
 		return errors.New("verification failed")
 	}
 	return nil
-}
-
-func (e *verifyFailExecutor) RunOutput(name string, args ...string) (string, error) {
-	return "", nil
 }
 
 func TestNotarize_SuccessWithMockExecutor(t *testing.T) {
@@ -440,14 +445,13 @@ func TestNotarize_SubmissionFails(t *testing.T) {
 
 func TestNotarize_StaplerFails(t *testing.T) {
 	t.Parallel()
-	callCount := 0
 	cfg := &hdiutil.Config{
 		SourceDir:           t.TempDir(),
 		OutputPath:          "test.dmg",
 		NotarizeCredentials: "my-profile",
 	}
 
-	r := hdiutil.New(cfg, hdiutil.WithExecutor(&staplerFailExecutor{callCount: &callCount}))
+	r := hdiutil.New(cfg, hdiutil.WithExecutor(&staplerFailExecutor{}))
 	t.Cleanup(r.Cleanup)
 	if err := r.Setup(); err != nil {
 		t.Fatalf("Setup() error = %v", err)
@@ -462,16 +466,12 @@ func TestNotarize_StaplerFails(t *testing.T) {
 	}
 }
 
-// staplerFailExecutor succeeds on Run (notarytool submit) but fails on RunOutput (stapler staple).
+// staplerFailExecutor succeeds on Xcrun (notarytool submit) but fails on XcrunOutput (stapler staple).
 type staplerFailExecutor struct {
-	callCount *int
+	noopExecutor
 }
 
-func (e *staplerFailExecutor) Run(name string, args ...string) error {
-	return nil
-}
-
-func (e *staplerFailExecutor) RunOutput(name string, args ...string) (string, error) {
+func (e *staplerFailExecutor) XcrunOutput(args ...string) (string, error) {
 	return "staple error output", errors.New("stapler failed")
 }
 
