@@ -1,32 +1,30 @@
 # hdiutil
 
-[![GoDoc](https://pkg.go.dev/badge/al.essio.dev/cmd/mkdmg/pkg/hdiutil.svg)](https://pkg.go.dev/al.essio.dev/cmd/mkdmg/pkg/hdiutil)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/gh/alessio/mkdmg/pkg/hdiutil)](https://www.codacy.com/gh/alessio/mkdmg/pkg/hdiutil/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=alessio/mkdmg&amp;utm_campaign=Badge_Grade)
-[![codecov](https://codecov.io/gh/alessio/mkdmg/pkg/hdiutil/branch/main/graph/badge.svg)](https://codecov.io/gh/alessio/mkdmg/pkg/hdiutil)
-[![Go Report Card](https://goreportcard.com/badge/github.com/alessio/mkdmg/pkg/hdiutil)](https://goreportcard.com/report/github.com/alessio/mkdmg/pkg/hdiutil)
-[![License](https://img.shields.io/github/license/alessio/mkdmg.svg)](https://github.com/alessio/mkdmg/blob/main/LICENSE)
+[![Go Reference](https://pkg.go.dev/badge/al.essio.dev/pkg/tools/hdiutil.svg)](https://pkg.go.dev/al.essio.dev/pkg/tools/hdiutil)
+[![Go Report Card](https://goreportcard.com/badge/al.essio.dev/pkg/tools)](https://goreportcard.com/report/al.essio.dev/pkg/tools)
+[![License](https://img.shields.io/github/license/alessio/unixtools.svg)](https://github.com/alessio/unixtools/blob/main/LICENSE)
 
-Package `hdiutil` provides a robust Go wrapper around the macOS `hdiutil` command-line tool, simplifying the creation, manipulation, and signing of DMG disk images.
+Package `hdiutil` provides a Go wrapper around the macOS `hdiutil` command-line tool for creating, manipulating, and signing DMG disk images.
 
-It allows programmatic control over the entire DMG lifecycle, from creating writable temporary images to finalizing them into compressed, read-only distribution artifacts.
+## Features
 
-## ✨ Features
+- **Image formats** — UDZO (zlib, default), UDBZ (bzip2), ULFO (lzfse), ULMO (lzma).
+- **Filesystems** — HFS+ (default, with tuned allocation parameters) and APFS.
+- **Workflow orchestration** — `Runner` manages the full lifecycle: create, mount, modify, convert, sign, notarize.
+- **Sandbox-safe images** — produce DMGs openable by sandboxed macOS applications.
+- **Code signing and notarization** — integrated codesign and Apple notarytool/stapler support.
+- **JSON configuration** — load/save `Config` from JSON files for CI/CD pipelines.
+- **Input sanitization** — rejects null bytes and dash-prefixed paths to prevent argument injection.
+- **Dry-run mode** — preview all hdiutil invocations without executing them.
+- **Testable** — typed `CommandExecutor` interface with `WithExecutor` option for mock injection.
 
-*   **Format Support:** Create DMGs in various formats: `UDZO` (zlib), `UDBZ` (bzip2), `ULFO` (lzfse), and `ULMO` (lzma).
-*   **Filesystems:** Support for both legacy **HFS+** and modern **APFS** filesystems.
-*   **Workflow Orchestration:** High-level `Runner` struct to manage the complex sequence of creating, mounting, copying, and converting images.
-*   **Security:** Integrated support for **Codesigning** and **Apple Notarization** (including stapling).
-*   **Sandboxing:** Option to create sandbox-safe disk images.
-
-## 📦 Installation
+## Installation
 
 ```sh
-go get al.essio.dev/cmd/mkdmg/pkg/hdiutil
+go get "al.essio.dev/pkg/tools/hdiutil"
 ```
 
-## 🚀 Usage
-
-Here is a simple example of how to use the package to create a DMG:
+## Usage
 
 ```go
 package main
@@ -34,7 +32,7 @@ package main
 import (
 	"log"
 
-	"al.essio.dev/cmd/mkdmg/pkg/hdiutil"
+	"al.essio.dev/pkg/tools/hdiutil"
 )
 
 func main() {
@@ -42,43 +40,73 @@ func main() {
 		SourceDir:  "./dist",
 		OutputPath: "MyApp.dmg",
 		VolumeName: "My App",
-		FileSystem: "HFS+",
 	}
 
 	runner := hdiutil.New(cfg)
-	// Ensure temporary files are cleaned up
 	defer runner.Cleanup()
 
-	// Initialize the runner
+	// 1. Validate config, create temp directory.
 	if err := runner.Setup(); err != nil {
 		log.Fatal(err)
 	}
 
-	// 1. Create temporary writable image
+	// 2. Create a writable temporary image populated from SourceDir.
 	if err := runner.Start(); err != nil {
 		log.Fatal(err)
 	}
 
-	// 2. Attach (mount) the image (Optional, if you need to modify it)
-	// if err := runner.AttachDiskImage(); err != nil {
-	// 	log.Fatal(err)
-	// }
-	// ... perform operations on mount ...
-	// if err := runner.DetachDiskImage(); err != nil {
-	// 	log.Fatal(err)
-	// }
+	// 3. (Optional) Mount, modify contents, unmount.
+	// if err := runner.AttachDiskImage(); err != nil { log.Fatal(err) }
+	// ... copy files, customise .DS_Store, etc.
+	// _ = runner.Bless()           // mark bootable (no-op unless Config.Bless is set)
+	// _ = runner.DetachDiskImage() // fixes permissions and unmounts
 
-	// 3. Convert to final compressed DMG
+	// 4. Convert to final compressed DMG.
 	if err := runner.FinalizeDMG(); err != nil {
 		log.Fatal(err)
 	}
 
-	// 4. Sign and Notarize (Optional)
-	// if err := runner.Codesign(); err != nil { ... }
-	// if err := runner.Notarize(); err != nil { ... }
+	// 5. (Optional) Sign and notarize — no-ops when credentials are empty.
+	if err := runner.Codesign(); err != nil {
+		log.Fatal(err)
+	}
+	if err := runner.Notarize(); err != nil {
+		log.Fatal(err)
+	}
 }
 ```
 
-## 📄 License
+### JSON configuration
 
-This package is part of the `mkdmg` project and is released under the same license.
+Config can be loaded from a JSON file, which is useful for CI/CD:
+
+```json
+{
+  "source_dir": "./dist",
+  "output_path": "MyApp.dmg",
+  "volume_name": "My App",
+  "filesystem": "HFS+",
+  "image_format": "UDZO",
+  "signing_identity": "Developer ID Application: Example Inc",
+  "notarize_credentials": "AC_PASSWORD"
+}
+```
+
+```go
+cfg, err := hdiutil.LoadConfig("dmg.json")
+```
+
+### Sandbox-safe images
+
+```go
+cfg := &hdiutil.Config{
+	SourceDir:   "./dist",
+	OutputPath:  "MyApp.dmg",
+	SandboxSafe: true,
+	FileSystem:  "HFS+", // APFS is not supported in sandbox-safe mode
+}
+```
+
+## License
+
+This package is part of the [unixtools](https://github.com/alessio/unixtools) project and is released under the same license.

@@ -133,11 +133,23 @@
 // Setting [Config.Simulate] logs every external command without executing it,
 // which is useful for previewing the hdiutil invocations that would be made.
 //
+// # Input sanitization
+//
+// [Config.Validate] rejects values that could lead to OS command argument
+// injection:
+//
+//   - Null bytes in any string field (SourceDir, OutputPath, VolumeName,
+//     SigningIdentity, NotarizeCredentials).
+//   - Paths (SourceDir, OutputPath) that start with a dash after
+//     [filepath.Clean], which could be misinterpreted as flags by external
+//     commands.
+//
 // # Error handling
 //
 // Sentinel errors are defined for every category of failure and can be
 // matched with [errors.Is]:
 //
+//   - [ErrUnsafeArg] — config value contains null bytes or unsafe characters.
 //   - [ErrInvSourceDir] — empty or missing source directory.
 //   - [ErrImageFileExt] — output path does not end in ".dmg".
 //   - [ErrInvFormatOpt] — unsupported image format.
@@ -154,6 +166,9 @@
 //
 // The [CommandExecutor] interface and the [WithExecutor] functional option
 // allow injecting a mock executor into [New], so tests can verify command
-// arguments and simulate failures without invoking real hdiutil/codesign/xcrun
-// binaries.
+// arguments and simulate failures without invoking real binaries.
+// [CommandExecutor] uses typed methods (Hdiutil, Codesign, Xcrun, Chmod,
+// Bless) rather than a generic Run(name, args...) to ensure that only
+// known commands can be executed and that static analysis tools see
+// literal command names in each [exec.Command] call.
 package hdiutil
