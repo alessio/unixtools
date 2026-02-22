@@ -92,9 +92,12 @@ func (e *realCommandExecutor) Run(name string, args ...string) error {
 	if err != nil {
 		return err
 	}
-	cmd := exec.Command(binPath, args...) // #nosec G204 -- binPath is resolved from allowedCommands via LookPath
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd := &exec.Cmd{
+		Path:   binPath,
+		Args:   append([]string{binPath}, args...),
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+	}
 	return cmd.Run()
 }
 
@@ -103,7 +106,10 @@ func (e *realCommandExecutor) RunOutput(name string, args ...string) (string, er
 	if err != nil {
 		return "", err
 	}
-	cmd := exec.Command(binPath, args...) // #nosec G204 -- binPath is resolved from allowedCommands via LookPath
+	cmd := &exec.Cmd{
+		Path: binPath,
+		Args: append([]string{binPath}, args...),
+	}
 	output, err := cmd.CombinedOutput()
 	return string(output), err
 }
