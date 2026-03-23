@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const (
@@ -93,6 +94,32 @@ func (b *Backups) PopDir(orig string) (string, bool) {
 
 // SnapshotsDir returns the snapshots base path.
 func (b *Backups) SnapshotsDir() string { return b.snapshotsDir }
+
+// ResolveSnapshotPath resolves a stored snapshot path against the snapshotsDir
+// and ensures that the resulting path stays within snapshotsDir.
+func (b *Backups) ResolveSnapshotPath(rel string) (string, error) {
+	base := filepath.Clean(b.snapshotsDir)
+	baseAbs, err := filepath.Abs(base)
+	if err != nil {
+		return "", fmt.Errorf("couldn't resolve snapshots base directory: %w", err)
+	}
+
+	joined := filepath.Join(baseAbs, rel)
+	resolved, err := filepath.Abs(joined)
+	if err != nil {
+		return "", fmt.Errorf("couldn't resolve snapshot path: %w", err)
+	}
+
+	baseWithSep := baseAbs
+	if !strings.HasSuffix(baseWithSep, string(os.PathSeparator)) {
+		baseWithSep += string(os.PathSeparator)
+	}
+	if resolved != baseAbs && !strings.HasPrefix(resolved, baseWithSep) {
+		return "", fmt.Errorf("snapshot path %q escapes snapshots directory %q", resolved, baseAbs)
+	}
+
+	return resolved, nil
+}
 
 // ensureConfigDir ensures that the user's Backups directory
 // is created and returns its absolute path.
