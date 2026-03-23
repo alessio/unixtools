@@ -232,7 +232,7 @@ func stampFilename(ident string) string {
 		return stampfile
 	}
 
-	return filepath.Join(cachedir, fmt.Sprintf("%s.stamp", ident))
+	return filepath.Clean(filepath.Join(cachedir, fmt.Sprintf("%s.stamp", ident)))
 }
 
 func cmdIdent(cmd *exec.Cmd) string {
