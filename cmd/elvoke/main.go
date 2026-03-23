@@ -136,6 +136,9 @@ func ensureCache() {
 
 	// Look up ELVOKE_HOME first for compatibility with upstream's.
 	if envHome := os.Getenv("ELVOKE_HOME"); envHome != "" {
+		if err := validateEnvDir(envHome); err != nil {
+			log.Fatal(err)
+		}
 		cachedir, err = normalizeDir(envHome)
 		if err != nil {
 			log.Fatal(err)
@@ -190,6 +193,17 @@ func normalizeDir(dir string) (string, error) {
 	}
 
 	return absDir, nil
+}
+
+func validateEnvDir(dir string) error {
+	if dir == "" {
+		return fmt.Errorf("environment directory path is empty")
+	}
+	// Reject obvious traversal patterns in ELVOKE_HOME.
+	if strings.Contains(dir, "..") {
+		return fmt.Errorf("environment directory path contains invalid components")
+	}
+	return nil
 }
 
 func stampFilename(ident string) string {
