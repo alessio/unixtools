@@ -45,7 +45,13 @@ func main() {
 }
 
 func backupDirectory(target string, backups *dirsnapshots.Backups) error {
-	backupDir, err := os.MkdirTemp(backups.SnapshotsDir(), "")
+	snapshotsBase := filepath.Clean(backups.SnapshotsDir())
+	snapshotsBaseAbs, err := filepath.Abs(snapshotsBase)
+	if err != nil {
+		return err
+	}
+
+	backupDir, err := os.MkdirTemp(snapshotsBaseAbs, "")
 	if err != nil {
 		return err
 	}
