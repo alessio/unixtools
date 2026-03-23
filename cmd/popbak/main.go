@@ -44,12 +44,17 @@ func restoreDirectory(target string, backups *dirsnapshots.Backups) error {
 		return fmt.Errorf("no backups available")
 	}
 
+	origPath, err := backups.ResolveSnapshotPath(orig)
+	if err != nil {
+		return fmt.Errorf("invalid snapshot path %q: %v", orig, err)
+	}
+
 	if err := os.RemoveAll(target); err != nil {
 		return fmt.Errorf("couldn't remove %q: %v", target, err)
 	}
 
-	if err := os.Rename(orig, target); err != nil {
-		return fmt.Errorf("couldn't rename %q: %v", orig, err)
+	if err := os.Rename(origPath, target); err != nil {
+		return fmt.Errorf("couldn't rename %q: %v", origPath, err)
 	}
 
 	return nil
