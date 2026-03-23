@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path"
 	"os/exec"
 	"path/filepath"
 	"strings"
