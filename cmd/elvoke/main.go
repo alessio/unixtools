@@ -177,7 +177,20 @@ func ensureCache() {
 }
 
 func mustMkDirAll(s string) {
-	if err := os.MkdirAll(s, os.ModePerm); err != nil {
+	if s == "" {
+		log.Fatal("directory path is empty")
+	}
+
+	absPath, err := filepath.Abs(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if !filepath.IsAbs(absPath) {
+		log.Fatal("directory path is not absolute")
+	}
+
+	if err := os.MkdirAll(absPath, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -199,10 +212,18 @@ func validateEnvDir(dir string) error {
 	if dir == "" {
 		return fmt.Errorf("environment directory path is empty")
 	}
+
+	// Normalize the directory to an absolute path.
+	absDir, err := filepath.Abs(dir)
+	if err != nil {
+		return fmt.Errorf("failed to normalize environment directory: %w", err)
+	}
+
 	// Reject obvious traversal patterns in ELVOKE_HOME.
-	if strings.Contains(dir, "..") {
+	if strings.Contains(absDir, "..") {
 		return fmt.Errorf("environment directory path contains invalid components")
 	}
+
 	return nil
 }
 
