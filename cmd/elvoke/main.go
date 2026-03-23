@@ -135,8 +135,11 @@ func ensureCache() {
 	var err error
 
 	// Look up ELVOKE_HOME first for compatibility with upstream's.
-	cachedir = os.Getenv("ELVOKE_HOME")
-	if cachedir != "" {
+	if envHome := os.Getenv("ELVOKE_HOME"); envHome != "" {
+		cachedir, err = normalizeDir(envHome)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
@@ -146,7 +149,10 @@ func ensureCache() {
 		log.Fatal(err)
 	}
 
-	cachedir = path.Join(homedir, ".elvoke")
+	cachedir, err = normalizeDir(path.Join(homedir, ".elvoke"))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	info, err := os.Stat(cachedir)
 	if err == nil && info.IsDir() {
@@ -155,12 +161,15 @@ func ensureCache() {
 
 	// Fallback to $XDG_CACHE_DIR/elvoke
 	// It creates the directory if it does not exist.
-	cachedir, err = os.UserCacheDir()
+	cacheBase, err := os.UserCacheDir()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	cachedir = filepath.Join(cachedir, "elvoke")
+	cachedir, err = normalizeDir(filepath.Join(cacheBase, "elvoke"))
+	if err != nil {
+		log.Fatal(err)
+	}
 	mustMkDirAll(cachedir)
 }
 
@@ -168,6 +177,19 @@ func mustMkDirAll(s string) {
 	if err := os.MkdirAll(s, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func normalizeDir(dir string) (string, error) {
+	if dir == "" {
+		return "", fmt.Errorf("empty directory path")
+	}
+
+	absDir, err := filepath.Abs(dir)
+	if err != nil {
+		return "", err
+	}
+
+	return absDir, nil
 }
 
 func stampFilename(ident string) string {
