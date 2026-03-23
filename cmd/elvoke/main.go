@@ -152,7 +152,7 @@ func ensureCache() {
 		log.Fatal(err)
 	}
 
-	cachedir, err = normalizeDir(path.Join(homedir, ".elvoke"))
+	cachedir, err = normalizeDir(filepath.Join(homedir, ".elvoke"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -181,16 +181,16 @@ func mustMkDirAll(s string) {
 		log.Fatal("directory path is empty")
 	}
 
-	absPath, err := filepath.Abs(s)
+	normalized, err := normalizeDir(s)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if !filepath.IsAbs(absPath) {
+	if !filepath.IsAbs(normalized) {
 		log.Fatal("directory path is not absolute")
 	}
 
-	if err := os.MkdirAll(absPath, os.ModePerm); err != nil {
+	if err := os.MkdirAll(normalized, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -203,6 +203,11 @@ func normalizeDir(dir string) (string, error) {
 	absDir, err := filepath.Abs(dir)
 	if err != nil {
 		return "", err
+	}
+
+	// Basic sanity check: reject paths with parent directory traversals.
+	if strings.Contains(absDir, "..") {
+		return "", fmt.Errorf("directory path contains invalid components")
 	}
 
 	return absDir, nil
