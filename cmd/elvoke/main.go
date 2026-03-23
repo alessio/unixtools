@@ -8,7 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"path/filepath"
+"os/exec"
+"path/filepath"
 	"strings"
 	"time"
 
