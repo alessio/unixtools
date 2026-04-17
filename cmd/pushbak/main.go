@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"path/filepath"
 
 	"al.essio.dev/pkg/tools/internal/dirsnapshots"
 	"al.essio.dev/pkg/tools/internal/file"
