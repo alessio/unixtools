@@ -124,12 +124,13 @@ func (b *Backups) ResolveSnapshotPath(rel string) (string, error) {
 // ensureConfigDir ensures that the user's Backups directory
 // is created and returns its absolute path.
 func ensureConfigDir() string {
-	configDir, err := os.UserConfigDir()
+	userConfigDir, err := os.UserConfigDir()
 	if err != nil {
 		panic(err)
 	}
 
-	snapshotsDir := filepath.Join(configDir, configDirname, snapshotsDirName)
+	configDir := filepath.Join(userConfigDir, configDirname)
+	snapshotsDir := filepath.Join(configDir, snapshotsDirName)
 	if err := os.MkdirAll(snapshotsDir, 0755); err != nil {
 		panic(fmt.Errorf("couldn't create %q: %w", snapshotsDir, err))
 	}
