@@ -4,7 +4,6 @@ import (
 	"flag"
 	"log"
 	"os"
-	"path/filepath"
 
 	"al.essio.dev/pkg/tools/internal/dirsnapshots"
 	"al.essio.dev/pkg/tools/internal/file"
@@ -45,8 +44,7 @@ func main() {
 }
 
 func backupDirectory(target string, backups *dirsnapshots.Backups) error {
-	snapshotsBase := filepath.Clean(backups.SnapshotsDir())
-	snapshotsBaseAbs, err := filepath.Abs(snapshotsBase)
+	snapshotsBaseAbs, err := backups.ResolveSnapshotPath(".")
 	if err != nil {
 		return err
 	}
