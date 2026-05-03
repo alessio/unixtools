@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"al.essio.dev/pkg/tools/internal/dirsnapshots"
 	"al.essio.dev/pkg/tools/internal/file"
@@ -44,8 +45,51 @@ func main() {
 	}
 }
 
+func validateSnapshotBaseDir(baseDir, expectedRoot string) (string, error) {
+	baseAbs, err := filepath.Abs(baseDir)
+	if err != nil {
+		return "", err
+	}
+	baseEval, err := filepath.EvalSymlinks(baseAbs)
+	if err != nil {
+		return "", err
+	}
+
+	rootAbs, err := filepath.Abs(expectedRoot)
+	if err != nil {
+		return "", err
+	}
+	rootEval, err := filepath.EvalSymlinks(rootAbs)
+	if err != nil {
+		return "", err
+	}
+
+	info, err := os.Stat(baseEval)
+	if err != nil {
+		return "", err
+	}
+	if !info.IsDir() {
+		return "", os.ErrInvalid
+	}
+
+	rootWithSep := rootEval
+	if !strings.HasSuffix(rootWithSep, string(os.PathSeparator)) {
+		rootWithSep += string(os.PathSeparator)
+	}
+	if baseEval != rootEval && !strings.HasPrefix(baseEval, rootWithSep) {
+		return "", os.ErrPermission
+	}
+
+	return baseEval, nil
+}
+
 func backupDirectory(target string, backups *dirsnapshots.Backups) error {
 	snapshotsBaseAbs, err := backups.ResolveSnapshotPath(".")
+	if err != nil {
+		return err
+	}
+
+	snapshotsBaseAbs, err = validateSnapshotBaseDir(snapshotsBaseAbs, backups.SnapshotsDir())
 	if err != nil {
 		return err
 	}
