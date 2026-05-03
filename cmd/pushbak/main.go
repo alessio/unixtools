@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"al.essio.dev/pkg/tools/internal/dirsnapshots"
 	"al.essio.dev/pkg/tools/internal/file"
@@ -72,11 +71,11 @@ func validateSnapshotBaseDir(baseDir, expectedRoot string) (string, error) {
 		return "", os.ErrInvalid
 	}
 
-	rootWithSep := rootEval
-	if !strings.HasSuffix(rootWithSep, string(os.PathSeparator)) {
-		rootWithSep += string(os.PathSeparator)
+	rel, err := filepath.Rel(rootEval, baseEval)
+	if err != nil {
+		return "", err
 	}
-	if baseEval != rootEval && !strings.HasPrefix(baseEval, rootWithSep) {
+	if rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) || filepath.IsAbs(rel) {
 		return "", os.ErrPermission
 	}
 

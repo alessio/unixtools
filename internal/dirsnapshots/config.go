@@ -110,11 +110,11 @@ func (b *Backups) ResolveSnapshotPath(rel string) (string, error) {
 		return "", fmt.Errorf("couldn't resolve snapshot path: %w", err)
 	}
 
-	baseWithSep := baseAbs
-	if !strings.HasSuffix(baseWithSep, string(os.PathSeparator)) {
-		baseWithSep += string(os.PathSeparator)
+	relToBase, err := filepath.Rel(baseAbs, resolved)
+	if err != nil {
+		return "", fmt.Errorf("couldn't evaluate snapshot path containment: %w", err)
 	}
-	if resolved != baseAbs && !strings.HasPrefix(resolved, baseWithSep) {
+	if relToBase == ".." || strings.HasPrefix(relToBase, ".."+string(os.PathSeparator)) || filepath.IsAbs(relToBase) {
 		return "", fmt.Errorf("snapshot path %q escapes snapshots directory %q", resolved, baseAbs)
 	}
 
