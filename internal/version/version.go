@@ -11,10 +11,6 @@ import (
 //go:embed version.txt
 var Version string
 
-//go:generate bash generate_revision.sh
-//go:embed revision.txt
-var GitRevision string
-
 func Short() string {
 	return fmt.Sprintf("unixtools %s", Version)
 }
