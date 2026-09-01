@@ -44,7 +44,7 @@ import (
 	"strconv"
 	"strings"
 
-	"al.essio.dev/cmd"
+	"al.essio.dev/tools/cmd"
 )
 
 var (

@@ -31,7 +31,7 @@ import (
 	"os"
 	"strings"
 
-	"al.essio.dev/cmd"
+	"al.essio.dev/tools/cmd"
 )
 
 const shortUsage = "usage: mcd DIR"
