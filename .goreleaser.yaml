@@ -5,10 +5,7 @@ before:
     - go generate ./...
 
 gomod:
-  proxy: true
-  env:
-    - GOPROXY=https://proxy.golang.org,direct
-    - GOSUMDB=sum.golang.org
+  module: al.essio.dev/tools/cmd
   mod: readonly
 
 builds:
