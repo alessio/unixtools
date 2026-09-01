@@ -1,3 +1,4 @@
+// Package file provides filesystem helper utilities such as recursive directory copying.
 package file
 
 /*
@@ -35,9 +36,8 @@ import (
 	"path/filepath"
 )
 
-// CopyDir recursively copies a directory tree, attempting to preserve permissions.
-// Source directory must exist, destination directory must *not* exist.
-// Symlinks are ignored and skipped.
+// CopyDir recursively copies a directory tree, preserving permissions and replicating symbolic links.
+// The source directory must exist, and the destination directory must not already exist.
 func CopyDir(src string, dst string) error {
 	src = filepath.Clean(src)
 	dst = filepath.Clean(dst)

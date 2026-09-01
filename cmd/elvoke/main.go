@@ -1,3 +1,34 @@
+// Command elvoke executes or postpones a command based on how much time
+// has elapsed since its last successful execution.
+//
+// Usage:
+//
+//	elvoke [OPTIONS] -- COMMAND [ARG]...
+//
+// Elvoke is a Go implementation of Jakub Wilk's elvoke (https://github.com/jwilk/elvoke).
+// It maintains a stamp file recording the timestamp of the last successful run.
+// If the elapsed duration is shorter than the configured interval, the command
+// execution is postponed (skipped).
+//
+// Stamp files are stored in the cache directory determined in the following order:
+//  1. $ELVOKE_HOME (if set)
+//  2. $HOME/.elvoke (if existing)
+//  3. $XDG_CACHE_DIR/elvoke (or system user cache directory)
+//
+// Options:
+//
+//	-interval duration
+//	    Minimum interval between invocations of the same command (default: 1h0m0s).
+//	-id string
+//	    Custom identifier to distinguish between commands (default: SHA256 of command path and arguments).
+//	-file string
+//	    Explicit stamp file path (default: $CACHEDIR/<IDENT>.stamp).
+//	-fail-on-postpone
+//	    Exit with a non-zero code (1) when postponing rather than exiting cleanly with 0.
+//	-debug
+//	    Print debug information to stderr.
+//	-version
+//	    Output version information and exit.
 package main
 
 import (

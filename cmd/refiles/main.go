@@ -1,3 +1,38 @@
+// Command refiles renames files matching a regular expression pattern.
+//
+// Usage:
+//
+//	refiles [OPTIONS] PATTERN REPLACE [DIRECTORY]...
+//
+// If no DIRECTORY argument is provided, refiles operates on the current working directory.
+//
+// Refiles replaces matched patterns in filenames with the replacement string.
+// In move mode (-m), it matches against the full filename and replaces it using
+// capture groups ($1, $2, etc.).
+//
+// Options:
+//
+//	-m
+//	    Move mode: match the entire filename and substitute with capture groups.
+//	-I
+//	    Interactive: prompt before overwriting any existing destination file.
+//	-R
+//	    Recursively process files in subdirectories.
+//	-simulate
+//	    Print planned rename operations without modifying the filesystem.
+//	-verbose
+//	    Enable detailed logging output to stderr.
+//
+// Examples:
+//
+//	# Replace spaces with underscores in all filenames in current directory:
+//	refiles ' ' '_'
+//
+//	# Reformat filenames using capture groups:
+//	refiles -m '^6.1.(\d{3})$' 'vim-6.1-$1.patch'
+//
+//	# Dry-run a recursive rename:
+//	refiles -simulate -R '([a-z]+)_old' '$1_new'
 package main
 
 import (

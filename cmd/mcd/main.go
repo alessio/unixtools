@@ -1,3 +1,27 @@
+// Command mcd creates a directory and all missing parent directories as required,
+// then emits "cd DIR" to standard output so that the invoking shell can change directories.
+//
+// Usage:
+//
+//	mcd DIR
+//
+// In case of error, mcd outputs ":" (a shell no-op) to stdout and error details to stderr.
+// This allows safe evaluation in shells using `eval "$(mcd path/to/dir)"`.
+//
+// Shell Integration:
+//
+// Add the following function to your ~/.bashrc or ~/.zshrc:
+//
+//	mcd() {
+//	    eval "$(command mcd "$@")"
+//	}
+//
+// Options:
+//
+//	-help
+//	    Display usage information and exit.
+//	-version
+//	    Output version information and exit.
 package main
 
 import (

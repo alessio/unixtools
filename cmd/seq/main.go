@@ -1,3 +1,39 @@
+// Command seq prints sequences of numbers from FIRST to LAST in increments of INCREMENT.
+//
+// Usage:
+//
+//	seq [OPTIONS] LAST
+//	seq [OPTIONS] FIRST LAST
+//	seq [OPTIONS] FIRST INCREMENT LAST
+//
+// When only LAST is specified, FIRST defaults to 1. If LAST is less than 1,
+// the sequence decreases towards LAST.
+// When INCREMENT is omitted, it defaults to 1.
+//
+// Options:
+//
+//	-separator string
+//	    Character string used to separate printed numbers (default: "\n").
+//	-width uint
+//	    Equalize width by padding numbers with leading zeroes up to the specified width.
+//	-help
+//	    Display usage information and exit.
+//	-version
+//	    Output version information and exit.
+//
+// Examples:
+//
+//	# Print numbers from 1 to 5:
+//	seq 5
+//
+//	# Print numbers from 1 to 10 in increments of 2:
+//	seq 1 2 10
+//
+//	# Print descending numbers:
+//	seq 10 1
+//
+//	# Print zero-padded numbers separated by commas:
+//	seq -separator ", " -width 3 1 10
 package main
 
 import (
