@@ -35,7 +35,7 @@ builds:
       - freebsd
 
   - id: refiles
-    main: ./cmd/refiles
+    main: ./refiles
     binary: refiles
     env:
       - CGO_ENABLED=0
@@ -46,7 +46,7 @@ builds:
       - freebsd
 
   - id: seq
-    main: ./cmd/seq
+    main: ./seq
     binary: seq
     env:
       - CGO_ENABLED=0
