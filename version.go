@@ -1,5 +1,5 @@
 // Package version provides version and build information for the unixtools suite.
-package version
+package cmd
 
 import (
 	"fmt"
@@ -27,4 +27,3 @@ func PrintWithCopyright() {
 func longWithCopyright() string {
 	return fmt.Sprintf("alessio's unixtools, Version %s\nCopyright (C) 2020, 2021, 2022, 2023 Alessio Treglia <alessio@debian.org>", strings.TrimSpace(Version))
 }
-

@@ -31,7 +31,7 @@ import (
 	"os"
 	"strings"
 
-	"al.essio.dev/cmd/version"
+	"al.essio.dev/cmd"
 )
 
 const shortUsage = "usage: mcd DIR"
@@ -83,7 +83,7 @@ func handleHelpAndVersionModes() {
 		usage()
 		os.Exit(0)
 	case versionMode:
-		version.PrintWithCopyright()
+		cmd.PrintWithCopyright()
 		os.Exit(0)
 	}
 }

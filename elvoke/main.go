@@ -42,7 +42,7 @@ import (
 	"strings"
 	"time"
 
-	"al.essio.dev/cmd/version"
+	"al.essio.dev/cmd"
 )
 
 var (
@@ -74,7 +74,7 @@ func main() {
 	flag.Parse()
 
 	if versionMode {
-		version.PrintWithCopyright()
+		cmd.PrintWithCopyright()
 		os.Exit(0)
 	}
 

@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-PKGS := $(shell go list ./cmd/...)
+PKGS := $(shell go list -f '{{if eq .Name "main"}}{{.ImportPath}}{{end}}' ./...)
 BINS =  $(shell basename $(PKGS))
 COVERAGE_REPORT_FILENAME ?= coverage.out
 BUILDDIR ?= $(CURDIR)/build
@@ -64,7 +64,6 @@ version.txt:
 	go mod verify
 	go mod tidy
 	go generate ./...
-	cp -f ./version/version.txt version.txt
 
 list:
 	@echo $(BINS) | tr ' ' '\n'

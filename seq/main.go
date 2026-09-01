@@ -44,7 +44,7 @@ import (
 	"strconv"
 	"strings"
 
-	"al.essio.dev/cmd/version"
+	"al.essio.dev/cmd"
 )
 
 var (
@@ -128,7 +128,7 @@ func handleHelpAndVersionModes() {
 	}
 
 	if versionMode {
-		version.PrintWithCopyright()
+		cmd.PrintWithCopyright()
 		os.Exit(0)
 	}
 }
