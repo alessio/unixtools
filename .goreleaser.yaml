@@ -6,10 +6,6 @@ before:
     - go mod tidy
     - go generate ./...
 
-gomod:
-  module: al.essio.dev/tools/cmd
-  mod: readonly
-
 builds:
   - id: elvoke
     main: ./elvoke
