@@ -3,7 +3,7 @@
 ## Installation
 
 ```shell
-go install al.essio.dev/pkg/tools/cmd/mcd@latest
+go install al.essio.dev/cmd/mcd@latest
 ```
 
 ## Usage
