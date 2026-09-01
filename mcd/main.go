@@ -31,7 +31,7 @@ import (
 	"os"
 	"strings"
 
-	"al.essio.dev/pkg/tools/internal/version"
+	"al.essio.dev/cmd/version"
 )
 
 const shortUsage = "usage: mcd DIR"

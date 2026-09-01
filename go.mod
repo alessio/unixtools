@@ -1,3 +1,3 @@
-module al.essio.dev/pkg/tools
+module al.essio.dev/cmd
 
 go 1.27
