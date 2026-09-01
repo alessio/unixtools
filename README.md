@@ -1,6 +1,5 @@
 ![Build](https://github.com/alessio/unixtools/workflows/Build/badge.svg)
 [![license](https://img.shields.io/github/license/alessio/unixtools.svg)](https://github.com/alessio/unixtools/blob/main/LICENSE)
-[![LoC](https://tokei.rs/b1/github/alessio/unixtools)](https://github.com/alessio/unixtools)
 [![codecov](https://codecov.io/github/alessio/unixtools/graph/badge.svg?token=XG71JUFEFN)](https://codecov.io/github/alessio/unixtools)
 
 # unixtools
