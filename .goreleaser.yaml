@@ -2,7 +2,7 @@ project_name: unixtools
 before:
   hooks:
     - go mod tidy
-    - go generate ./internal/...
+    - go generate ./...
 
 gomod:
   proxy: true
@@ -13,7 +13,7 @@ gomod:
 
 builds:
   - id: elvoke
-    main: ./cmd/elvoke
+    main: ./elvoke
     binary: elvoke
     env:
       - CGO_ENABLED=0
@@ -24,52 +24,8 @@ builds:
       - freebsd
 
   - id: mcd
-    main: ./cmd/mcd
+    main: ./mcd
     binary: mcd
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - id: pathctl
-    main: ./cmd/pathctl
-    binary: pathctl
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - id: popbak
-    main: ./cmd/popbak
-    binary: popbak
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - id: portup
-    main: ./cmd/portup
-    binary: portup
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - darwin
-      - openbsd
-      - freebsd
-
-  - id: pushbak
-    main: ./cmd/pushbak
-    binary: pushbak
     env:
       - CGO_ENABLED=0
     goos:

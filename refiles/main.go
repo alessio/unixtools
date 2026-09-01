@@ -155,15 +155,15 @@ func replaceFilename(pattern *regexp.Regexp, filename, replace string) string {
 	return string(result)
 }
 
-func rename(orig, new string, interactive, simulate bool) {
-	if orig == new { // skip if noop
+func rename(orig, newName string, interactive, simulate bool) {
+	if orig == newName { // skip if noop
 		return
 	}
 
-	verboseLog.Printf("%q -> %q", orig, new)
+	verboseLog.Printf("%q -> %q", orig, newName)
 
 	if interactive {
-		if _, err := os.Stat(new); err == nil && !confirmPrompt(orig, new) {
+		if _, err := os.Stat(newName); err == nil && !confirmPrompt(orig, newName) {
 			return
 		}
 	}
@@ -172,7 +172,7 @@ func rename(orig, new string, interactive, simulate bool) {
 		return
 	}
 
-	if err := os.Rename(orig, new); err != nil {
+	if err := os.Rename(orig, newName); err != nil {
 		log.Printf("couldn't rename %s: %v", orig, err)
 	}
 }

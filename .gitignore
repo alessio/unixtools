@@ -22,6 +22,6 @@ generate-stamp
 .DS_Store
 
 .envrc
-version.txt
+#version.txt
 
 .vscode
