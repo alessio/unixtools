@@ -27,15 +27,15 @@ jobs:
       - run: go build -o ./build/ ./...
       - run: go test -race ./...
 
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v7
-    - uses: actions/setup-go@v7
-      with:
-        go-version: 'stable'
-    - name: Coverage
-      run: go test -race -cover -covermode=atomic -coverprofile=coverage.txt ./...
-    - uses: codecov/codecov-action@v7
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+  # coverage:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v7
+  #   - uses: actions/setup-go@v7
+  #     with:
+  #       go-version: 'stable'
+  #   - name: Coverage
+  #     run: go test -race -cover -covermode=atomic -coverprofile=coverage.txt ./...
+  #   - uses: codecov/codecov-action@v7
+  #     with:
+  #       token: ${{ secrets.CODECOV_TOKEN }}
