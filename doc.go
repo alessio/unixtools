@@ -9,6 +9,6 @@
 //
 // Each utility is independently installable via standard Go tooling:
 //
-//	go install al.essio.dev/cmd/<tool>@latest
+//	go install al.essio.dev/tools/cmd/<tool>@latest
 package cmd
 

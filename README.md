@@ -13,10 +13,10 @@ A collection of UNIX convenience tools written in Go.
 You can install individual tools directly with `go install`:
 
 ```bash
-go install al.essio.dev/cmd/elvoke@latest
-go install al.essio.dev/cmd/mcd@latest
-go install al.essio.dev/cmd/refiles@latest
-go install al.essio.dev/cmd/seq@latest
+go install al.essio.dev/tools/cmd/elvoke@latest
+go install al.essio.dev/tools/cmd/mcd@latest
+go install al.essio.dev/tools/cmd/refiles@latest
+go install al.essio.dev/tools/cmd/seq@latest
 ```
 
 ### Building from Source
