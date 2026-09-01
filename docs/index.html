@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>unixtools - UNIX Convenience Utilities in Go</title>
+  <meta name="description" content="A curated suite of modern, fast UNIX convenience tools written in Go: elvoke, mcd, refiles, and seq.">
+  <style>
+    :root {
+      --bg: #fafafa;
+      --card: #ffffff;
+      --card-alt: #f4f4f8;
+      --text: #1a1a2e;
+      --muted: #64648c;
+      --accent: #4f46e5;
+      --accent-light: #818cf8;
+      --accent-glow: rgba(79, 70, 229, 0.15);
+      --border: #e2e2ec;
+      --code-bg: #f0eef8;
+      --tag-bg: #ede9fe;
+      --tag-text: #4338ca;
+      --gradient-start: #4f46e5;
+      --gradient-end: #06b6d4;
+      --success: #10b981;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d0f17;
+        --card: #151926;
+        --card-alt: #1c2132;
+        --text: #e8eaf2;
+        --muted: #9ba1b8;
+        --accent: #818cf8;
+        --accent-light: #6366f1;
+        --accent-glow: rgba(129, 140, 248, 0.2);
+        --border: #242b3d;
+        --code-bg: #1a1f30;
+        --tag-bg: #272c47;
+        --tag-text: #c7d2fe;
+        --gradient-start: #818cf8;
+        --gradient-end: #38bdf8;
+        --success: #34d399;
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 70px 0 50px;
+    }
+
+    .hero-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      display: inline-block;
+      animation: float 3s ease-in-out infinite;
+      user-select: none;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .hero h1 {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .hero .tagline {
+      font-size: 20px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .hero .description {
+      font-size: 16px;
+      color: var(--muted);
+      margin-top: 14px;
+      max-width: 580px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Buttons */
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Badges Bar */
+    .badges-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+
+    .badges-bar a img {
+      height: 20px;
+      vertical-align: middle;
+      border-radius: 3px;
+    }
+
+    /* Tool Nav Pills */
+    .tool-nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 36px 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: "SF Mono", "Fira Code", monospace;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .nav-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    /* Install Box */
+    .install-section {
+      margin-top: 28px;
+    }
+
+    .install-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+      background: var(--card-alt);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      background: var(--tag-bg);
+      border-color: var(--border);
+    }
+
+    .install-box {
+      display: flex;
+      justify-content: center;
+    }
+
+    .install-cmd {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 20px;
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+      font-size: 13.5px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+      position: relative;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .install-cmd:hover { border-color: var(--accent); }
+
+    .install-cmd::before {
+      content: "$";
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.15s ease;
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover { color: var(--accent); }
+    .copy-btn svg { width: 16px; height: 16px; }
+
+    .copy-tooltip {
+      position: absolute;
+      top: -30px;
+      right: 10px;
+      background: var(--text);
+      color: var(--bg);
+      font-size: 12px;
+      font-family: -apple-system, sans-serif;
+      padding: 3px 8px;
+      border-radius: 5px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      transform: translateY(4px);
+    }
+
+    .copy-tooltip.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Section Styles */
+    section {
+      padding: 40px 0;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .section-subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: -16px;
+      margin-bottom: 28px;
+    }
+
+    /* Features */
+    .features {
+      padding: 20px 0 50px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .feature-card p {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Tools Showcase */
+    .tool-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 36px;
+      position: relative;
+      scroll-margin-top: 30px;
+    }
+
+    .tool-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    .tool-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tool-name {
+      font-size: 24px;
+      font-weight: 800;
+      font-family: "SF Mono", "Fira Code", monospace;
+      color: var(--accent);
+    }
+
+    .tool-badge {
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .tool-desc {
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 18px;
+    }
+
+    .tool-desc a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .tool-desc a:hover {
+      text-decoration: underline;
+    }
+
+    .tool-subheading {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin: 18px 0 8px;
+    }
+
+    /* Code Block */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: auto;
+      color: var(--text);
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .code-block .comment { color: var(--muted); }
+    .code-block .flag { color: var(--accent); }
+    .code-block .string { color: #d97706; }
+    .code-block .cmd { color: #0284c7; font-weight: 600; }
+
+    @media (prefers-color-scheme: dark) {
+      .code-block .string { color: #f59e0b; }
+      .code-block .cmd { color: #38bdf8; }
+    }
+
+    /* Options Table */
+    .options-table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin: 12px 0 18px;
+    }
+
+    .options-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      background: var(--card);
+    }
+
+    .options-table th {
+      text-align: left;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      background: var(--card-alt);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .options-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .options-table tr:last-child td { border-bottom: none; }
+
+    .options-table code {
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      white-space: nowrap;
+    }
+
+    .options-table .desc { color: var(--text); }
+    .options-table .default { color: var(--muted); font-size: 12.5px; }
+
+    /* Build Section */
+    .build-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 48px 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 40px;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    .footer-links {
+      margin-top: 8px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 640px) {
+      .hero { padding: 50px 0 35px; }
+      .hero h1 { font-size: 38px; }
+      .hero .tagline { font-size: 17px; }
+      .tool-card { padding: 20px; }
+      .tool-header { flex-direction: column; align-items: flex-start; }
+      .install-cmd { font-size: 12px; padding: 12px 14px; }
+      .options-table { font-size: 12.5px; }
+      .options-table th, .options-table td { padding: 8px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-icon" aria-hidden="true">&#x1F6E0;&#xFE0F;</span>
+      <h1>unixtools</h1>
+      <p class="tagline">Modern UNIX Convenience Utilities in Go</p>
+      <p class="description">
+        A curated suite of fast, lightweight, zero-dependency command-line tools designed to streamline everyday shell workflows.
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="buttons">
+        <a href="https://github.com/alessio/unixtools/releases" class="btn btn-primary">
+          <svg viewBox="0 0 16 16"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14ZM7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.969a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.78a.749.749 0 1 1 1.06-1.06l1.97 1.969Z"/></svg>
+          Releases
+        </a>
+        <a href="https://github.com/alessio/unixtools" class="btn btn-secondary">
+          <svg viewBox="0 0 16 16"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
+          GitHub
+        </a>
+        <a href="https://pkg.go.dev/al.essio.dev/pkg/tools" class="btn btn-secondary">
+          <svg viewBox="0 0 16 16"><path d="M0 2.75C0 1.784.784 1 1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 14.25 15H1.75A1.75 1.75 0 0 1 0 13.25Zm1.75-.25a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V2.75a.25.25 0 0 0-.25-.25ZM3.5 4.5h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1 0-1.5Zm0 3h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1 0-1.5Zm0 3h5a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1 0-1.5Z"/></svg>
+          GoDoc
+        </a>
+      </div>
+
+      <!-- Badges -->
+      <div class="badges-bar">
+        <a href="https://github.com/alessio/unixtools/actions"><img src="https://github.com/alessio/unixtools/workflows/Build/badge.svg" alt="Build Status"></a>
+        <a href="https://github.com/alessio/unixtools/blob/main/LICENSE"><img src="https://img.shields.io/github/license/alessio/unixtools.svg" alt="MIT License"></a>
+        <a href="https://codecov.io/github/alessio/unixtools"><img src="https://codecov.io/github/alessio/unixtools/graph/badge.svg?token=XG71JUFEFN" alt="Code Coverage"></a>
+      </div>
+
+      <!-- Tool Quick Jump Pills -->
+      <div class="tool-nav">
+        <a href="#elvoke" class="nav-pill">elvoke</a>
+        <a href="#mcd" class="nav-pill">mcd</a>
+        <a href="#refiles" class="nav-pill">refiles</a>
+        <a href="#seq" class="nav-pill">seq</a>
+      </div>
+
+      <!-- Install Switcher Box -->
+      <div class="install-section" id="installSection">
+        <div class="install-tabs">
+          <button class="tab-btn active" onclick="switchInstall('elvoke', this)">elvoke</button>
+          <button class="tab-btn" onclick="switchInstall('mcd', this)">mcd</button>
+          <button class="tab-btn" onclick="switchInstall('refiles', this)">refiles</button>
+          <button class="tab-btn" onclick="switchInstall('seq', this)">seq</button>
+        </div>
+        <div class="install-box">
+          <div class="install-cmd" id="installCmd" onclick="copyInstallCmd(this)">
+            <span id="installCmdText">go install al.essio.dev/pkg/tools/cmd/elvoke@latest</span>
+            <button class="copy-btn" aria-label="Copy to clipboard">
+              <svg viewBox="0 0 16 16"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25ZM5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>
+            </button>
+            <span class="copy-tooltip">Copied!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title">Built for Shell Productivity</h2>
+      <p class="section-subtitle">Focused UNIX utilities that do one job cleanly and reliably.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">&#x26A1;</span>
+          <h3>Pure Go & Fast</h3>
+          <p>Zero external runtime dependencies. Compiles to static, ultra-fast native binaries.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">&#x23F1;&#xFE0F;</span>
+          <h3>Time-Aware Execution</h3>
+          <p>Throttles recurring commands and cron tasks using file stamps without background daemons.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">&#x1F4C1;</span>
+          <h3>Seamless Directory Navigation</h3>
+          <p>Create deeply nested directories and change into them in one seamless command.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">&#x1F522;</span>
+          <h3>Regex Batch Renaming</h3>
+          <p>Powerful bulk file renaming with full regex capture groups, simulation mode, and safety prompts.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">&#x1F522;</span>
+          <h3>Flexible Sequences</h3>
+          <p>High-performance sequence generator with custom step increments, separators, and zero-padding.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">&#x1F6E1;&#xFE0F;</span>
+          <h3>Safe Simulation</h3>
+          <p>Preview rename plans with <code>-simulate</code> before any filesystem changes occur.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools Details -->
+  <section class="tools">
+    <div class="container">
+      <h2 class="section-title">The Utilities</h2>
+
+      <!-- elvoke -->
+      <div class="tool-card" id="elvoke">
+        <div class="tool-header">
+          <div class="tool-title-group">
+            <span class="tool-name">elvoke</span>
+            <span class="tool-badge">Execution Throttler</span>
+          </div>
+          <a href="#installSection" onclick="switchInstall('elvoke')" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">go install</a>
+        </div>
+        <p class="tool-desc">
+          A Go implementation of Jakub Wilk's <a href="https://github.com/jwilk/elvoke" target="_blank" rel="noopener">elvoke</a>.
+          Runs or postpones a command depending on how much time has elapsed since the last successful run.
+        </p>
+
+        <div class="tool-subheading">Usage</div>
+        <div class="code-block">
+          <span class="cmd">elvoke</span> [<span class="flag">OPTIONS</span>] <span class="flag">--</span> <span class="cmd">COMMAND</span> [<span class="string">ARGS</span>]...
+        </div>
+
+        <div class="tool-subheading">Options</div>
+        <div class="options-table-wrap">
+          <table class="options-table">
+            <thead>
+              <tr><th>Option</th><th>Description</th><th>Default</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>-interval</code></td><td class="desc">Minimum interval between invocations of the same command</td><td class="default"><code>1h0m0s</code></td></tr>
+              <tr><td><code>-id</code></td><td class="desc">Identifier to distinguish between different commands</td><td class="default"><em>(auto-generated)</em></td></tr>
+              <tr><td><code>-file</code></td><td class="desc">Custom stamp file path</td><td class="default"><code>$CACHE/elvoke/&lt;ID&gt;.stamp</code></td></tr>
+              <tr><td><code>-fail-on-postpone</code></td><td class="desc">Exit with a non-zero exit code when postponing</td><td class="default"><code>false</code></td></tr>
+              <tr><td><code>-debug</code></td><td class="desc">Print debug information to stderr</td><td class="default"><code>false</code></td></tr>
+              <tr><td><code>-version</code></td><td class="desc">Output version information and exit</td><td class="default"><code>false</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tool-subheading">Example</div>
+        <div class="code-block">
+          <span class="comment"># Run apt-get update only if at least 24 hours have passed since the last run</span><br>
+          <span class="cmd">elvoke</span> <span class="flag">-interval</span> <span class="string">24h</span> <span class="flag">--</span> <span class="cmd">apt-get update</span>
+        </div>
+      </div>
+
+      <!-- mcd -->
+      <div class="tool-card" id="mcd">
+        <div class="tool-header">
+          <div class="tool-title-group">
+            <span class="tool-name">mcd</span>
+            <span class="tool-badge">Directory Helper</span>
+          </div>
+          <a href="#installSection" onclick="switchInstall('mcd')" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">go install</a>
+        </div>
+        <p class="tool-desc">
+          Creates target directory along with any missing parent directories, and emits <code>cd DIR</code> to standard output so your shell changes directory immediately.
+        </p>
+
+        <div class="tool-subheading">Usage</div>
+        <div class="code-block">
+          <span class="cmd">mcd</span> <span class="string">DIR</span>
+        </div>
+
+        <div class="tool-subheading">Shell Integration</div>
+        <p class="tool-desc" style="font-size: 14px; margin-bottom: 8px;">
+          Add this wrapper function to your <code>~/.bashrc</code> or <code>~/.zshrc</code>:
+        </p>
+        <div class="code-block">
+          <span class="cmd">mcd</span>() {<br>
+          &nbsp;&nbsp;<span class="cmd">eval</span> <span class="string">"$(command mcd "$@")"</span><br>
+          }
+        </div>
+      </div>
+
+      <!-- refiles -->
+      <div class="tool-card" id="refiles">
+        <div class="tool-header">
+          <div class="tool-title-group">
+            <span class="tool-name">refiles</span>
+            <span class="tool-badge">Regex Renamer</span>
+          </div>
+          <a href="#installSection" onclick="switchInstall('refiles')" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">go install</a>
+        </div>
+        <p class="tool-desc">
+          A regular expression batch file renaming tool inspired by Gustavo Niemeyer's <a href="http://niemeyer.net/remv" target="_blank" rel="noopener">remv</a>.
+        </p>
+
+        <div class="tool-subheading">Usage</div>
+        <div class="code-block">
+          <span class="cmd">refiles</span> [<span class="flag">OPTIONS</span>] <span class="string">PATTERN</span> <span class="string">REPLACE</span> [<span class="string">DIRECTORY</span>]...
+        </div>
+
+        <div class="tool-subheading">Options</div>
+        <div class="options-table-wrap">
+          <table class="options-table">
+            <thead>
+              <tr><th>Option</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>-m</code></td><td class="desc">Move mode: match against full filename and replace entire name using capture groups</td></tr>
+              <tr><td><code>-I</code></td><td class="desc">Prompt before every file overwrite</td></tr>
+              <tr><td><code>-R</code></td><td class="desc">Search files under each directory recursively</td></tr>
+              <tr><td><code>-simulate</code></td><td class="desc">Print planned renames without executing any filesystem modifications</td></tr>
+              <tr><td><code>-verbose</code></td><td class="desc">Enable verbose logging</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tool-subheading">Examples</div>
+        <div class="code-block">
+          <span class="comment"># Replace spaces with underscores in filenames:</span><br>
+          <span class="cmd">refiles</span> <span class="string">' '</span> <span class="string">'_'</span><br>
+          <br>
+          <span class="comment"># Move/rename files matching a pattern using regex capture groups:</span><br>
+          <span class="cmd">refiles</span> <span class="flag">-m</span> <span class="string">'^6.1.(\d{3})$'</span> <span class="string">'vim-6.1-$1.patch'</span><br>
+          <br>
+          <span class="comment"># Preview planned changes recursively before applying:</span><br>
+          <span class="cmd">refiles</span> <span class="flag">-simulate</span> <span class="flag">-R</span> <span class="string">'([a-z]+)_old'</span> <span class="string">'$1_new'</span>
+        </div>
+      </div>
+
+      <!-- seq -->
+      <div class="tool-card" id="seq">
+        <div class="tool-header">
+          <div class="tool-title-group">
+            <span class="tool-name">seq</span>
+            <span class="tool-badge">Sequence Generator</span>
+          </div>
+          <a href="#installSection" onclick="switchInstall('seq')" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">go install</a>
+        </div>
+        <p class="tool-desc">
+          A pure Go implementation of the standard UNIX <code>seq</code> command for generating number sequences.
+        </p>
+
+        <div class="tool-subheading">Usage</div>
+        <div class="code-block">
+          <span class="cmd">seq</span> [<span class="flag">OPTIONS</span>] <span class="string">LAST</span><br>
+          <span class="cmd">seq</span> [<span class="flag">OPTIONS</span>] <span class="string">FIRST</span> <span class="string">LAST</span><br>
+          <span class="cmd">seq</span> [<span class="flag">OPTIONS</span>] <span class="string">FIRST</span> <span class="string">INCREMENT</span> <span class="string">LAST</span>
+        </div>
+
+        <div class="tool-subheading">Options</div>
+        <div class="options-table-wrap">
+          <table class="options-table">
+            <thead>
+              <tr><th>Option</th><th>Description</th><th>Default</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>-separator</code></td><td class="desc">String to separate printed numbers</td><td class="default"><code>\n</code></td></tr>
+              <tr><td><code>-width</code></td><td class="desc">Equalize width by padding numbers with leading zeroes</td><td class="default"><code>0</code> (off)</td></tr>
+              <tr><td><code>-help</code></td><td class="desc">Display usage help and exit</td><td class="default"><code>false</code></td></tr>
+              <tr><td><code>-version</code></td><td class="desc">Output version information and exit</td><td class="default"><code>false</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tool-subheading">Examples</div>
+        <div class="code-block">
+          <span class="comment"># Print numbers from 1 to 5:</span><br>
+          <span class="cmd">seq</span> <span class="string">5</span><br>
+          <br>
+          <span class="comment"># Print numbers from 1 to 10 with step 2:</span><br>
+          <span class="cmd">seq</span> <span class="string">1 2 10</span><br>
+          <br>
+          <span class="comment"># Print formatted numbers separated by commas and padded with zeroes:</span><br>
+          <span class="cmd">seq</span> <span class="flag">-separator</span> <span class="string">", "</span> <span class="flag">-width</span> <span class="string">3</span> <span class="string">1 10</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Build from Source -->
+  <section class="build" id="build">
+    <div class="container">
+      <h2 class="section-title">Building from Source</h2>
+      <p class="section-subtitle">Clone the repository and build all binaries in one step using Make.</p>
+      <div class="build-box">
+        <div class="code-block" style="margin-bottom: 0;">
+          <span class="comment"># Clone and build all tools</span><br>
+          <span class="cmd">git clone</span> https://github.com/alessio/unixtools.git<br>
+          <span class="cmd">cd</span> unixtools<br>
+          <span class="cmd">make</span> build<br>
+          <br>
+          <span class="comment"># Binaries will be ready in build/</span><br>
+          <span class="cmd">ls</span> -l build/
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      Made with care by <a href="https://github.com/alessio">Alessio Treglia</a><br>
+      <div class="footer-links">
+        <a href="https://pkg.go.dev/al.essio.dev/pkg/tools">GoDoc</a> &middot;
+        <a href="https://github.com/alessio/unixtools/releases">Releases</a> &middot;
+        <a href="https://github.com/alessio/unixtools/blob/main/LICENSE">MIT License</a> &middot;
+        <a href="https://github.com/alessio/unixtools">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const installCommands = {
+      elvoke: 'go install al.essio.dev/pkg/tools/cmd/elvoke@latest',
+      mcd: 'go install al.essio.dev/pkg/tools/cmd/mcd@latest',
+      refiles: 'go install al.essio.dev/pkg/tools/cmd/refiles@latest',
+      seq: 'go install al.essio.dev/pkg/tools/cmd/seq@latest'
+    };
+
+    function switchInstall(tool, btn) {
+      const cmdText = document.getElementById('installCmdText');
+      if (cmdText && installCommands[tool]) {
+        cmdText.textContent = installCommands[tool];
+      }
+      
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(b => {
+        if (b.textContent.trim().toLowerCase() === tool) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
+      });
+    }
+
+    function copyInstallCmd(el) {
+      const text = document.getElementById('installCmdText').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const tooltip = el.querySelector('.copy-tooltip');
+        if (tooltip) {
+          tooltip.classList.add('show');
+          setTimeout(() => tooltip.classList.remove('show'), 1500);
+        }
+      }).catch(() => {
+        // Fallback if clipboard API restricted
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        const tooltip = el.querySelector('.copy-tooltip');
+        if (tooltip) {
+          tooltip.classList.add('show');
+          setTimeout(() => tooltip.classList.remove('show'), 1500);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
