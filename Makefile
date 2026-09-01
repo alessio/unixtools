@@ -64,7 +64,7 @@ version.txt:
 	go mod verify
 	go mod tidy
 	go generate ./...
-	cp -f ./internal/version/version.txt version.txt
+	cp -f ./version/version.txt version.txt
 
 list:
 	@echo $(BINS) | tr ' ' '\n'

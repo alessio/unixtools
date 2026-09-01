@@ -42,7 +42,7 @@ import (
 	"strings"
 	"time"
 
-	"al.essio.dev/pkg/tools/internal/version"
+	"al.essio.dev/cmd/version"
 )
 
 var (
