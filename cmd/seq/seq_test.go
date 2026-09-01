@@ -1,10 +1,8 @@
-package seq_test
+package main
 
 import (
 	"fmt"
 	"testing"
-
-	"al.essio.dev/pkg/tools/internal/seq"
 )
 
 func Test_IntSequence(t *testing.T) {
@@ -35,7 +33,7 @@ func Test_IntSequence(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			s := seq.NewInt(tt.args.start, tt.args.incr, tt.args.end, tt.args.width)
+			s := NewInt(tt.args.start, tt.args.incr, tt.args.end, tt.args.width)
 			out := []string{}
 			if s.WidthExceeded() {
 				t.Fatal("width exceeded")
@@ -58,7 +56,7 @@ func Test_IntSequence(t *testing.T) {
 }
 
 func ExampleSequence_Items() {
-	s := seq.NewInt(20, 5, 100, 3)
+	s := NewInt(20, 5, 100, 3)
 	for i := range s.Items() {
 		fmt.Println(i)
 	}

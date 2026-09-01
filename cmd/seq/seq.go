@@ -1,5 +1,5 @@
 // Package seq provides integer sequence generation utilities with support for custom intervals, boundaries, and zero-padding.
-package seq
+package main
 
 import (
 	"fmt"

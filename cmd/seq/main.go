@@ -44,7 +44,6 @@ import (
 	"strconv"
 	"strings"
 
-	"al.essio.dev/pkg/tools/internal/seq"
 	"al.essio.dev/pkg/tools/internal/version"
 )
 
@@ -104,7 +103,7 @@ func main() {
 	}
 
 	bldr := strings.Builder{}
-	sequence := seq.NewInt(start, uint(incr), end, width)
+	sequence := NewInt(start, uint(incr), end, width)
 
 	for item := range sequence.Items() {
 		if bldr.Len() > 0 {
